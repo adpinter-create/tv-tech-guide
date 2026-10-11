@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Physics of the Picture — A Field Guide to TV Display Technology (2025–2026)</title>
+<meta name="description" content="A course-length field guide to TV display technology: OLED, QD-OLED, Mini-LED, RGB-LED, MicroLED and QDEL, from first principles to price tags.">
+<meta property="og:title" content="The Physics of the Picture">
+<meta property="og:description" content="How every TV display technology makes light and bends it into color, and what each one costs.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://tv.andreipinter.com/">
+<meta name="theme-color" content="#06080d">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1'%3E%3Cstop offset='0' stop-color='%236b2fb5'/%3E%3Cstop offset='.35' stop-color='%231fd2ff'/%3E%3Cstop offset='.65' stop-color='%231fe08a'/%3E%3Cstop offset='1' stop-color='%23ff3b47'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='7' fill='%2306080d'/%3E%3Crect x='5' y='8' width='22' height='14' rx='2' fill='none' stroke='url(%23g)' stroke-width='2.4'/%3E%3Cpath d='M11 26h10' stroke='%232bd9ff' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06080d;
+  --bg-1:#0a0e16;
+  --panel:#0e121b;
+  --panel-2:#141a26;
+  --panel-3:#1a2231;
+  --line:#1f2735;
+  --line-2:#2a3343;
+  --text:#e8ecf3;
+  --dim:#99a2b3;
+  --faint:#5c6577;
+  --cyan:#2bd9ff;
+  --cyan-deep:#0fa8cc;
+  --red:#ff3b47;
+  --green:#1fe08a;
+  --blue:#4d7cff;
+  --amber:#f5b544;
+  --magenta:#ff4d8d;
+  --violet:#8b6cff;
+  --maxw:1180px;
+  --readw:720px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'IBM Plex Sans',system-ui,sans-serif;
+  font-weight:400;
+  line-height:1.65;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* ---------- spectrum primitives (the signature) ---------- */
+.spectrum-grad{
+  background:linear-gradient(90deg,
+    #6b2fb5 0%, #3b30d6 9%, #2e6bff 18%, #1fd2ff 30%,
+    #1fe08a 44%, #c8e64b 56%, #f5b544 68%, #ff7a3c 80%, #ff3b47 100%);
+}
+.scroll-spine{
+  position:fixed;top:0;left:0;height:3px;width:100%;
+  background:#10141d;z-index:200;
+}
+.scroll-spine__fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,
+    #6b2fb5,#2e6bff,#1fd2ff,#1fe08a,#f5b544,#ff3b47);
+  box-shadow:0 0 14px rgba(43,217,255,.55);
+  transition:width .08s linear;
+}
+
+/* ---------- top nav ---------- */
+.topbar{
+  position:fixed;top:3px;left:0;width:100%;z-index:150;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px clamp(16px,4vw,40px);
+  background:rgba(6,8,13,.72);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.brand__dot{
+  width:13px;height:13px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fff,var(--cyan) 45%,var(--cyan-deep) 70%,transparent 72%);
+  box-shadow:0 0 12px var(--cyan);
+}
+.brand__txt{
+  font-family:'Chakra Petch',sans-serif;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;font-size:13px;color:var(--text);
+}
+.brand__txt span{color:var(--cyan)}
+.topnav{display:flex;gap:26px}
+.topnav a{
+  color:var(--dim);text-decoration:none;font-size:13px;
+  font-family:'IBM Plex Mono',monospace;letter-spacing:.02em;
+  transition:color .2s;
+}
+.topnav a:hover{color:var(--cyan)}
+@media(max-width:880px){.topnav{display:none}}
+
+/* ---------- layout shell ---------- */
+.shell{max-width:var(--maxw);margin:0 auto;padding:0 clamp(16px,4vw,40px)}
+
+/* ---------- hero ---------- */
+.hero{
+  position:relative;min-height:100vh;display:flex;flex-direction:column;
+  justify-content:center;padding:120px clamp(16px,4vw,40px) 60px;
+  max-width:var(--maxw);margin:0 auto;overflow:hidden;
+}
+.hero__grid{
+  position:absolute;inset:0;z-index:0;
+  background-image:
+    linear-gradient(rgba(43,217,255,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(43,217,255,.045) 1px,transparent 1px);
+  background-size:46px 46px;
+  mask-image:radial-gradient(ellipse 90% 70% at 30% 40%,#000 30%,transparent 78%);
+  -webkit-mask-image:radial-gradient(ellipse 90% 70% at 30% 40%,#000 30%,transparent 78%);
+}
+.hero__content{position:relative;z-index:2;max-width:880px}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--cyan);margin-bottom:26px;
+}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--cyan);opacity:.7}
+.hero h1{
+  font-family:'Chakra Petch',sans-serif;font-weight:700;
+  font-size:clamp(2.6rem,7vw,5.4rem);line-height:1.02;letter-spacing:-.01em;
+  margin-bottom:8px;
+}
+.hero h1 .glow{
+  color:#fff;
+  text-shadow:0 0 26px rgba(43,217,255,.45),0 0 60px rgba(43,217,255,.18);
+}
+.hero h1 .sub{
+  display:block;font-family:'IBM Plex Sans',sans-serif;font-weight:300;
+  font-size:clamp(1.05rem,2.4vw,1.6rem);letter-spacing:.01em;color:var(--dim);
+  margin-top:22px;line-height:1.5;max-width:680px;text-shadow:none;
+}
+.hero__readouts{
+  display:flex;flex-wrap:wrap;gap:30px;margin-top:46px;
+  padding-top:30px;border-top:1px solid var(--line);
+}
+.readout{display:flex;flex-direction:column;gap:3px}
+.readout__v{
+  font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:1.7rem;color:var(--text);
+}
+.readout__v.c{color:var(--cyan)}
+.readout__l{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--faint);
+}
+.hero__spectrum{
+  position:relative;z-index:2;margin-top:54px;
+}
+.hero__spectrum-bar{
+  height:10px;border-radius:5px;
+  box-shadow:0 0 24px rgba(43,217,255,.25);
+}
+.hero__spectrum-scale{
+  display:flex;justify-content:space-between;margin-top:8px;
+  font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--faint);
+  letter-spacing:.08em;
+}
+.scrollcue{
+  position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;
+  color:var(--faint);text-transform:uppercase;display:flex;flex-direction:column;
+  align-items:center;gap:8px;z-index:2;
+}
+.scrollcue__line{width:1px;height:34px;background:linear-gradient(var(--cyan),transparent);animation:cue 2.2s var(--ease) infinite}
+@keyframes cue{0%,100%{opacity:.3;transform:scaleY(.6)}50%{opacity:1;transform:scaleY(1)}}
+@media (prefers-reduced-motion:reduce){.scrollcue__line{animation:none}}
+
+/* ---------- module / section ---------- */
+.module{padding:104px 0 30px;position:relative}
+.module__head{max-width:var(--readw);margin-bottom:46px}
+.module__num{
+  font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:13px;
+  letter-spacing:.28em;color:var(--cyan);display:block;margin-bottom:16px;
+}
+.module__title{
+  font-family:'Chakra Petch',sans-serif;font-weight:700;
+  font-size:clamp(1.9rem,4.4vw,3rem);line-height:1.08;letter-spacing:-.01em;margin-bottom:20px;
+}
+.module__intro{font-size:1.1rem;color:var(--dim);font-weight:300;line-height:1.7}
+
+.prose{max-width:var(--readw)}
+.prose p{margin-bottom:20px;color:#d6dbe6}
+.prose h3{
+  font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:1.35rem;
+  margin:42px 0 16px;letter-spacing:-.005em;color:var(--text);
+  display:flex;align-items:baseline;gap:12px;
+}
+.prose h3::before{
+  content:"";width:8px;height:8px;border-radius:2px;background:var(--cyan);
+  box-shadow:0 0 10px var(--cyan);flex:none;transform:translateY(-2px);
+}
+.prose h4{
+  font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:1.05rem;
+  margin:28px 0 10px;color:var(--text);
+}
+.prose strong{color:#fff;font-weight:600}
+.prose em{color:var(--cyan);font-style:normal;font-weight:500}
+.prose a{color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(43,217,255,.3)}
+.prose a:hover{border-color:var(--cyan)}
+.prose ul{margin:0 0 22px;padding-left:0;list-style:none}
+.prose li{
+  position:relative;padding-left:26px;margin-bottom:11px;color:#d6dbe6;
+}
+.prose li::before{
+  content:"";position:absolute;left:4px;top:11px;width:6px;height:6px;
+  border-radius:50%;background:var(--cyan);opacity:.8;
+}
+
+.lede{
+  font-size:1.18rem;line-height:1.7;color:var(--text);font-weight:300;
+  border-left:2px solid var(--cyan);padding-left:22px;margin:0 0 30px;
+}
+
+/* keyterm chips */
+.term{
+  color:var(--cyan);font-weight:500;border-bottom:1px dotted rgba(43,217,255,.5);
+  cursor:help;
+}
+
+/* ---------- figure / chart frame ---------- */
+.figure{
+  margin:44px 0;border:1px solid var(--line);border-radius:14px;
+  background:linear-gradient(180deg,var(--panel),var(--bg-1));
+  overflow:hidden;
+}
+.figure--wide{max-width:none}
+.figure__bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;border-bottom:1px solid var(--line);
+  background:rgba(20,26,38,.5);
+}
+.figure__tag{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--faint);
+}
+.figure__tag b{color:var(--cyan);font-weight:600}
+.figure__body{padding:28px 24px}
+.figure__cap{
+  padding:0 24px 22px;font-size:13.5px;color:var(--faint);line-height:1.6;
+  font-family:'IBM Plex Sans',sans-serif;
+}
+.figure__cap b{color:var(--dim);font-weight:600}
+
+/* ---------- generic data table ---------- */
+.tbl-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--line);margin:34px 0}
+table.data{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px}
+table.data th,table.data td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line)}
+table.data thead th{
+  font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);
+  background:rgba(20,26,38,.6);position:sticky;top:0;
+}
+table.data tbody tr:hover{background:rgba(43,217,255,.04)}
+table.data td:first-child{font-weight:500;color:#fff}
+table.data .mono{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--dim)}
+
+/* ---------- callout ---------- */
+.callout{
+  border:1px solid var(--line-2);border-radius:12px;padding:22px 24px;margin:32px 0;
+  background:var(--panel-2);position:relative;
+}
+.callout__k{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;
+}
+.callout__k::before{content:"";width:7px;height:7px;border-radius:50%}
+.callout--myth{border-left:3px solid var(--magenta)}
+.callout--myth .callout__k{color:var(--magenta)}
+.callout--myth .callout__k::before{background:var(--magenta);box-shadow:0 0 8px var(--magenta)}
+.callout--note{border-left:3px solid var(--cyan)}
+.callout--note .callout__k{color:var(--cyan)}
+.callout--note .callout__k::before{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.callout--warn{border-left:3px solid var(--amber)}
+.callout--warn .callout__k{color:var(--amber)}
+.callout--warn .callout__k::before{background:var(--amber);box-shadow:0 0 8px var(--amber)}
+.callout p{margin:0;color:#d6dbe6;font-size:15px}
+.callout p+p{margin-top:12px}
+
+/* section divider with spectrum */
+.divider{height:1px;margin:0 auto;max-width:var(--maxw);position:relative;opacity:.5}
+.divider::before{content:"";position:absolute;inset:0;}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+
+/* focus */
+a:focus-visible,button:focus-visible,input:focus-visible{
+  outline:2px solid var(--cyan);outline-offset:3px;border-radius:3px;
+}
+
+/* footer */
+.footer{
+  border-top:1px solid var(--line);margin-top:90px;padding:60px clamp(16px,4vw,40px) 70px;
+  max-width:var(--maxw);margin-left:auto;margin-right:auto;
+}
+.footer h3{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:1.2rem;margin-bottom:18px;color:var(--text)}
+.src-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 30px;margin-bottom:40px}
+.src-grid a{
+  color:var(--dim);text-decoration:none;font-size:14px;padding:7px 0;
+  border-bottom:1px solid var(--line);transition:color .2s;display:flex;justify-content:space-between;gap:10px;
+}
+.src-grid a:hover{color:var(--cyan)}
+.src-grid a span{color:var(--faint);font-family:'IBM Plex Mono',monospace;font-size:11px}
+.footer__meta{font-size:12.5px;color:var(--faint);line-height:1.7;font-family:'IBM Plex Mono',monospace}
+
+/* utility */
+.accent-r{color:var(--red)}.accent-g{color:var(--green)}.accent-b{color:var(--blue)}
+.accent-m{color:var(--magenta)}.accent-a{color:var(--amber)}.accent-c{color:var(--cyan)}
+.nowrap{white-space:nowrap}
+svg{display:block;max-width:100%;height:auto}
+.tooltip{
+  position:fixed;z-index:300;pointer-events:none;opacity:0;transition:opacity .12s;
+  background:var(--panel-3);border:1px solid var(--line-2);border-radius:8px;
+  padding:9px 12px;font-size:12.5px;color:var(--text);max-width:220px;
+  box-shadow:0 8px 28px rgba(0,0,0,.5);font-family:'IBM Plex Sans',sans-serif;
+}
+.tooltip b{color:var(--cyan);font-family:'Chakra Petch',sans-serif}
+.tooltip .mono{font-family:'IBM Plex Mono',monospace;color:var(--dim);font-size:11px}
+
+/* ---- anchor offset ---- */
+.module,.footer{scroll-margin-top:90px}
+
+/* ---- blooming demo buttons ---- */
+.zbtn{
+  font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.04em;
+  color:var(--dim);background:var(--panel-2);border:1px solid var(--line-2);
+  padding:9px 15px;border-radius:8px;cursor:pointer;transition:all .18s var(--ease);
+}
+.zbtn:hover{color:var(--text);border-color:var(--cyan);background:var(--panel-3)}
+.zbtn.active{color:#06080d;background:var(--cyan);border-color:var(--cyan);font-weight:600;box-shadow:0 0 16px rgba(43,217,255,.4)}
+
+/* ---- matrix rating bars ---- */
+.rate{position:relative;height:8px;width:62px;border-radius:4px;background:#1a2231;overflow:hidden}
+.rate>span{position:absolute;left:0;top:0;height:100%;border-radius:4px}
+table.data td.ratecell{padding:13px 16px}
+
+/* ---- use-case grid ---- */
+.usecase{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:16px;margin-top:8px}
+.uc{
+  border:1px solid var(--line);border-radius:13px;padding:22px;
+  background:linear-gradient(180deg,var(--panel),var(--bg-1));transition:border-color .2s,transform .2s;
+}
+.uc:hover{border-color:var(--line-2);transform:translateY(-2px)}
+.uc__use{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--faint);margin-bottom:12px;
+}
+.uc__pick{
+  font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:1.25rem;
+  color:var(--cyan);margin-bottom:10px;line-height:1.15;
+}
+.uc__why{font-size:14px;color:var(--dim);line-height:1.55}
+
+/* ---- recommendation grid ---- */
+.rec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:18px;margin-bottom:26px}
+.rec{
+  border:1px solid var(--line);border-radius:15px;padding:0;overflow:hidden;
+  background:linear-gradient(180deg,var(--panel),var(--bg-1));transition:border-color .2s,transform .2s;
+}
+.rec:hover{border-color:var(--cyan);transform:translateY(-3px)}
+.rec__strip{height:4px}
+.rec__body{padding:24px}
+.rec__tier{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--faint);margin-bottom:6px;
+}
+.rec__price{
+  font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text);margin-bottom:16px;
+}
+.rec__pick{
+  font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:1.3rem;
+  color:var(--text);margin-bottom:12px;line-height:1.15;
+}
+.rec__why{font-size:14px;color:var(--dim);line-height:1.6}
+
+/* ---- video grid ---- */
+.vid-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:8px}
+.vid{text-decoration:none;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--panel);transition:border-color .2s,transform .2s;display:block}
+.vid:hover{border-color:var(--cyan);transform:translateY(-2px)}
+.vid__thumb{
+  aspect-ratio:16/9;background:linear-gradient(135deg,#0e121b,#141a26);
+  display:flex;align-items:center;justify-content:center;position:relative;border-bottom:1px solid var(--line);
+}
+.vid__play{
+  width:48px;height:48px;border-radius:50%;background:rgba(43,217,255,.12);
+  border:1.5px solid var(--cyan);display:flex;align-items:center;justify-content:center;
+}
+.vid__play::after{content:"";border-left:14px solid var(--cyan);border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px}
+.vid__meta{padding:16px 18px}
+.vid__name{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:1.05rem;color:var(--text);margin-bottom:4px}
+.vid__who{font-size:13px;color:var(--dim);font-family:'IBM Plex Mono',monospace}
+
+@media(max-width:560px){
+  body{font-size:16px}
+  .hero__readouts{gap:20px}
+  .readout__v{font-size:1.4rem}
+}
+</style>
+</head>
+<body>
+
+<div class="scroll-spine"><div class="scroll-spine__fill" id="spine"></div></div>
+
+<header class="topbar">
+  <a class="brand" href="#top">
+    <span class="brand__dot"></span>
+    <span class="brand__txt">PHYSICS OF THE <span>PICTURE</span></span>
+  </a>
+  <nav class="topnav">
+    <a href="#m00">00 · Foundations</a>
+    <a href="#m03">03 · LCD</a>
+    <a href="#m04">04 · OLED</a>
+    <a href="#m05">05 · Frontier</a>
+    <a href="#m06">06 · Compare</a>
+    <a href="#m07">07 · Cost</a>
+    <a href="#m08">08 · Buy</a>
+  </nav>
+</header>
+
+<!-- ========================= HERO ========================= -->
+<section class="hero" id="top">
+  <div class="hero__grid"></div>
+  <div class="hero__content">
+    <span class="eyebrow">A field guide · 2025–2026 · from photons to price tags</span>
+    <h1>
+      <span class="glow">The Physics</span><br>of the Picture
+      <span class="sub">Every television is a machine for two jobs: making light, and bending it into color. This is a complete, course-length tour of how each display technology does it — OLED, QD-OLED, Mini-LED, the brand-new RGB-LED backlights, true MicroLED and the quantum-dot future — built up from first principles, and ending with exactly what each one costs you.</span>
+    </h1>
+    <div class="hero__readouts">
+      <div class="readout"><span class="readout__v c">8</span><span class="readout__l">Technologies dissected</span></div>
+      <div class="readout"><span class="readout__v">380–700</span><span class="readout__l">Nanometers of visible light</span></div>
+      <div class="readout"><span class="readout__v">6,014</span><span class="readout__l">Brightest measured nits</span></div>
+      <div class="readout"><span class="readout__v">580×</span><span class="readout__l">Cheapest to dearest set</span></div>
+    </div>
+  </div>
+  <div class="hero__spectrum">
+    <div class="hero__spectrum-bar spectrum-grad"></div>
+    <div class="hero__spectrum-scale">
+      <span>380 nm — violet</span><span>blue</span><span>green</span><span>yellow</span><span>orange</span><span>700 nm — red</span>
+    </div>
+  </div>
+</section>
+
+<div class="tooltip" id="tip"></div>
+
+<!-- ===================== MODULE 00 — FOUNDATIONS ===================== -->
+<section class="module" id="m00">
+  <div class="shell">
+    <div class="module__head reveal">
+      <span class="module__num">MODULE 00 / FOUNDATIONS</span>
+      <h2 class="module__title">There are only two ways to make a picture</h2>
+      <p class="module__intro">Strip away every brand name and acronym and all television technology splits into two camps, decided by a single question: where does the light come from? Get this distinction and the rest of the field falls into place.</p>
+    </div>
+
+    <div class="prose reveal">
+      <p class="lede">A <em>transmissive</em> display has one big light in the back and uses a stack of filters to block and tint it. An <em>emissive</em> display has millions of tiny lights — one per pixel — that switch themselves on and off. That is the whole fault line. LCD, LED, QLED, and Mini-LED are all transmissive. OLED, QD-OLED, MicroLED, and the coming QDEL are all emissive.</p>
+
+      <p>Why does it matter so much? Because of black. A transmissive panel's liquid-crystal "shutters" can never close completely — a little backlight always leaks through — so its darkest black is really a dim grey. An emissive panel makes black by simply switching a pixel <strong>off</strong>: zero light, perfect black, and therefore effectively <em>infinite</em> contrast. Almost every difference you will read about downstream — contrast, viewing angles, thinness, burn-in risk, price — traces back to this one architectural choice.</p>
+    </div>
+
+    <figure class="figure figure--wide reveal">
+      <div class="figure__bar">
+        <span class="figure__tag">Figure 00.1 — <b>Cross-section</b> · how each stack turns power into a lit pixel</span>
+        <span class="figure__tag">schematic</span>
+      </div>
+      <div class="figure__body">
+        <svg viewBox="0 0 860 430" role="img" aria-label="Side by side cross sections comparing a transmissive LCD stack with a backlight and filters against an emissive stack with per-pixel light sources">
+          <defs>
+            <linearGradient id="blGlow" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0" stop-color="#4d7cff" stop-opacity=".25"/>
+              <stop offset="1" stop-color="#4d7cff" stop-opacity=".9"/>
+            </linearGradient>
+            <linearGradient id="leak" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0" stop-color="#4d7cff" stop-opacity=".5"/>
+              <stop offset="1" stop-color="#4d7cff" stop-opacity="0"/>
+            </linearGradient>
+            <marker id="ah" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+              <path d="M1,1 L7,4 L1,7" fill="none" stroke="#2bd9ff" stroke-width="1.3"/>
+            </marker>
+          </defs>
+
+          <!-- ===== LEFT: TRANSMISSIVE ===== -->
+          <text x="20" y="28" font-family="'Chakra Petch'" font-size="15" font-weight="600" fill="#4d7cff">TRANSMISSIVE  ·  LCD / LED / QLED / MINI-LED</text>
+          <text x="20" y="46" font-family="'IBM Plex Mono'" font-size="11" fill="#5c6577">one backlight, filtered down to a picture</text>
+
+          <!-- stack bands (bottom=back) -->
+          <g font-family="'IBM Plex Mono'" font-size="10.5" fill="#99a2b3">
+            <!-- backlight -->
+            <rect x="40" y="320" width="240" height="34" rx="3" fill="url(#blGlow)" stroke="#4d7cff" stroke-opacity=".5"/>
+            <text x="295" y="341" >① Backlight — LED / Mini-LED array</text>
+            <!-- diffuser -->
+            <rect x="40" y="296" width="240" height="18" rx="2" fill="#1a2231" stroke="#2a3343"/>
+            <text x="295" y="309">② Diffuser + light guide</text>
+            <!-- rear pol -->
+            <rect x="40" y="278" width="240" height="12" rx="2" fill="#10141d" stroke="#2a3343"/>
+            <text x="295" y="288">③ Rear polariser</text>
+            <!-- LC layer -->
+            <rect x="40" y="250" width="240" height="22" rx="2" fill="#141a26" stroke="#2a3343"/>
+            <text x="295" y="265">④ Liquid-crystal shutters (TFT)</text>
+            <!-- color filter -->
+            <g>
+              <rect x="40" y="232" width="240" height="12" rx="2" fill="#10141d" stroke="#2a3343"/>
+              <!-- rgb stripes -->
+              <g opacity=".9">
+                <rect x="44" y="234" width="6" height="8" fill="#ff3b47"/><rect x="52" y="234" width="6" height="8" fill="#1fe08a"/><rect x="60" y="234" width="6" height="8" fill="#4d7cff"/>
+                <rect x="70" y="234" width="6" height="8" fill="#ff3b47"/><rect x="78" y="234" width="6" height="8" fill="#1fe08a"/><rect x="86" y="234" width="6" height="8" fill="#4d7cff"/>
+              </g>
+              <text x="295" y="242">⑤ RGB colour filter</text>
+            </g>
+            <!-- front pol -->
+            <rect x="40" y="214" width="240" height="12" rx="2" fill="#10141d" stroke="#2a3343"/>
+            <text x="295" y="224">⑥ Front polariser + glass</text>
+          </g>
+
+          <!-- light rays up: one bright (white pixel), one leaking (black pixel) -->
+          <line x1="90" y1="318" x2="90" y2="150" stroke="#2bd9ff" stroke-width="2" marker-end="url(#ah)"/>
+          <text x="78" y="140" font-family="'IBM Plex Mono'" font-size="10" fill="#2bd9ff">lit pixel → bright</text>
+          <!-- leak -->
+          <rect x="150" y="150" width="26" height="64" fill="url(#leak)"/>
+          <line x1="163" y1="318" x2="163" y2="214" stroke="#4d7cff" stroke-width="2" stroke-opacity=".35" stroke-dasharray="3 3"/>
+          <text x="186" y="186" font-family="'IBM Plex Mono'" font-size="10" fill="#ff4d8d">"off" pixel still leaks</text>
+          <text x="186" y="200" font-family="'IBM Plex Mono'" font-size="10" fill="#ff4d8d">→ black looks grey</text>
+
+          <!-- ===== RIGHT: EMISSIVE ===== -->
+          <text x="470" y="28" font-family="'Chakra Petch'" font-size="15" font-weight="600" fill="#f5b544">EMISSIVE  ·  OLED / QD-OLED / MICROLED</text>
+          <text x="470" y="46" font-family="'IBM Plex Mono'" font-size="11" fill="#5c6577">every pixel is its own light</text>
+
+          <!-- black substrate -->
+          <rect x="470" y="232" width="300" height="122" rx="4" fill="#06080d" stroke="#1f2735"/>
+          <text x="470" y="372" font-family="'IBM Plex Mono'" font-size="10.5" fill="#99a2b3">Pixels emit directly — no backlight, no shutters, no filter loss</text>
+
+          <!-- pixel grid: some lit, some pure black -->
+          <g>
+            <!-- row1 -->
+            <rect x="486" y="248" width="20" height="20" rx="3" fill="#ff3b47"/><rect x="486" y="248" width="20" height="20" rx="3" fill="#ff3b47" opacity=".5"/>
+            <rect x="512" y="248" width="20" height="20" rx="3" fill="#0a0e16" stroke="#10141d"/>
+            <rect x="538" y="248" width="20" height="20" rx="3" fill="#1fe08a"/>
+            <rect x="564" y="248" width="20" height="20" rx="3" fill="#0a0e16" stroke="#10141d"/>
+            <rect x="590" y="248" width="20" height="20" rx="3" fill="#4d7cff"/>
+            <rect x="616" y="248" width="20" height="20" rx="3" fill="#0a0e16" stroke="#10141d"/>
+            <rect x="642" y="248" width="20" height="20" rx="3" fill="#f5b544"/>
+            <rect x="668" y="248" width="20" height="20" rx="3" fill="#0a0e16" stroke="#10141d"/>
+            <rect x="694" y="248" width="20" height="20" rx="3" fill="#ff4d8d"/>
+            <rect x="720" y="248" width="20" height="20" rx="3" fill="#0a0e16" stroke="#10141d"/>
+            <!-- row2 -->
+            <rect x="486" y="274" width="20" height="20" rx="3" fill="#0a0e16" stroke="#10141d"/>
+            <rect x="512" y="274" width="20" height="20" rx="3" fill="#2bd9ff"/>
+            <rect x="538" y="274" width="20" height="20" rx="3" fill="#0a0e16" stroke="#10141d"/>
+            <rect x="564" y="274" width="20" height="20" rx="3" fill="#fff"/>
+            <rect x="590" y="274" width="20" height="20" rx="3" fill="#0a0e16" stroke="#10141d"/>
+            <rect x="616" y="274" width="20" height="20" rx="3" fill="#ff3b47"/>
+            <rect x="642" y="274" width="20" height="20" rx="3" fill="#0a0e16" stroke="#10141d"/>
+            <rect x="668" y="274" width="20" height="20" rx="3" fill="#1fe08a"/>
+            <rect x="694" y="274" width="20" height="20" rx="3" fill="#0a0e16" stroke="#10141d"/>
+            <rect x="720" y="274" width="20" height="20" rx="3" fill="#8b6cff"/>
+            <!-- row3 -->
+            <rect x="486" y="300" width="20" height="20" rx="3" fill="#1fe08a"/>
+            <rect x="512" y="300" width="20" height="20" rx="3" fill="#0a0e16" stroke="#10141d"/>
+            <rect x="538" y="300" width="20" height="20" rx="3" fill="#ff4d8d"/>
+            <rect x="564" y="300" width="20" height="20" rx="3" fill="#0a0e16" stroke="#10141d"/>
+            <rect x="590" y="300" width="20" height="20" rx="3" fill="#f5b544"/>
+            <rect x="616" y="300" width="20" height="20" rx="3" fill="#0a0e16" stroke="#10141d"/>
+            <rect x="642" y="300" width="20" height="20" rx="3" fill="#4d7cff"/>
+            <rect x="668" y="300" width="20" height="20" rx="3" fill="#0a0e16" stroke="#10141d"/>
+            <rect x="694" y="300" width="20" height="20" rx="3" fill="#2bd9ff"/>
+            <rect x="720" y="300" width="20" height="20" rx="3" fill="#0a0e16" stroke="#10141d"/>
+          </g>
+          <!-- emit arrows -->
+          <line x1="496" y1="248" x2="496" y2="150" stroke="#2bd9ff" stroke-width="2" marker-end="url(#ah)"/>
+          <text x="500" y="150" font-family="'IBM Plex Mono'" font-size="10" fill="#2bd9ff">lit → emits</text>
+          <line x1="522" y1="248" x2="522" y2="200" stroke="#1f2735" stroke-width="2" stroke-dasharray="3 3"/>
+          <text x="528" y="180" font-family="'IBM Plex Mono'" font-size="10" fill="#5c6577">off → true black, 0 nits</text>
+        </svg>
+      </div>
+      <figcaption class="figure__cap"><b>How to read it:</b> The LCD stack (left) fires one backlight through six filtering layers; even a pixel told to be "black" leaks a little blue, so its black floor is a dim grey. The emissive stack (right) lights each pixel individually, so "off" means genuinely zero light. Every headline spec difference downstream is a consequence of this single design fork.</figcaption>
+    </figure>
+
+    <div class="callout callout--myth reveal">
+      <div class="callout__k">Myth check</div>
+      <p><strong>"QLED is the rival to OLED."</strong> Not in the way the names imply. <span class="accent-m">QLED is an LCD</span> — a backlit, transmissive panel with a quantum-dot film added for richer color. It cannot make true black. The genuinely emissive quantum-dot technology (the one that would deserve to be OLED's rival) is <strong>QDEL / NanoLED</strong>, and it is still in the lab. We will meet it in Module 05.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MODULE 01 — VOCABULARY ===================== -->
+<section class="module" id="m01">
+  <div class="shell">
+    <div class="module__head reveal">
+      <span class="module__num">MODULE 01 / THE LANGUAGE OF LIGHT</span>
+      <h2 class="module__title">The nine words that decide a picture</h2>
+      <p class="module__intro">Spec sheets are written in a dialect designed to confuse. Here is the working vocabulary — defined plainly, with the marketing traps flagged — so that every number later in this guide means something.</p>
+    </div>
+
+    <figure class="figure figure--wide reveal">
+      <div class="figure__bar">
+        <span class="figure__tag">Figure 01.1 — <b>The brightness ladder</b> · where real content lives, in nits (cd/m²)</span>
+        <span class="figure__tag">log-ish scale</span>
+      </div>
+      <div class="figure__body">
+        <svg viewBox="0 0 860 220" role="img" aria-label="A horizontal brightness scale in nits showing where SDR content, HDR highlights, and flagship TV peaks sit">
+          <defs>
+            <linearGradient id="brightbar" x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0" stop-color="#0e121b"/><stop offset=".25" stop-color="#1a2231"/>
+              <stop offset=".55" stop-color="#f5b544" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity=".95"/>
+            </linearGradient>
+          </defs>
+          <rect x="40" y="74" width="780" height="26" rx="13" fill="url(#brightbar)" stroke="#2a3343"/>
+          <!-- ticks -->
+          <g font-family="'IBM Plex Mono'" font-size="10.5" fill="#5c6577" text-anchor="middle">
+            <line x1="40" y1="100" x2="40" y2="112" stroke="#2a3343"/><text x="40" y="128">1</text>
+            <line x1="235" y1="100" x2="235" y2="112" stroke="#2a3343"/><text x="235" y="128">100</text>
+            <line x1="430" y1="100" x2="430" y2="112" stroke="#2a3343"/><text x="430" y="128">1,000</text>
+            <line x1="625" y1="100" x2="625" y2="112" stroke="#2a3343"/><text x="625" y="128">3,000</text>
+            <line x1="820" y1="100" x2="820" y2="112" stroke="#2a3343"/><text x="820" y="128">6,000+</text>
+          </g>
+          <!-- markers above -->
+          <g font-family="'IBM Plex Sans'" font-size="12">
+            <line x1="200" y1="56" x2="200" y2="74" stroke="#99a2b3"/><text x="200" y="48" text-anchor="middle" fill="#99a2b3">SDR content ≈ 100–200</text>
+            <line x1="400" y1="36" x2="400" y2="74" stroke="#f5b544"/><text x="400" y="28" text-anchor="middle" fill="#f5b544">Good HDR highlights ≈ 600–1,000</text>
+            <line x1="560" y1="56" x2="560" y2="74" stroke="#2bd9ff"/><text x="560" y="48" text-anchor="middle" fill="#2bd9ff">Flagship OLED ≈ 2,000–2,200</text>
+            <line x1="760" y1="36" x2="760" y2="74" stroke="#fff"/><text x="760" y="28" text-anchor="middle" fill="#e8ecf3">RGB Mini-LED ≈ 5,400–6,000</text>
+          </g>
+          <text x="40" y="170" font-family="'IBM Plex Mono'" font-size="11" fill="#5c6577">A "nit" is one candela per square metre. Note the gap: most of what you watch sits near the dim left end —</text>
+          <text x="40" y="188" font-family="'IBM Plex Mono'" font-size="11" fill="#5c6577">peak brightness only ever fills tiny highlights (a glint, the sun), never the whole screen at once.</text>
+        </svg>
+      </div>
+    </figure>
+
+    <div class="prose reveal">
+      <h3>The core nine</h3>
+    </div>
+
+    <div class="tbl-wrap reveal">
+      <table class="data">
+        <thead><tr><th>Term</th><th>What it actually means</th><th>The trap</th></tr></thead>
+        <tbody>
+          <tr><td>Nit (cd/m²)</td><td>Unit of brightness. SDR ≈ 100–200; strong HDR highlights 600–1,000+; 2025 flagships 2,000–6,000.</td><td class="mono">Peak ≠ full-screen. A set hitting 4,000-nit highlights may only sustain ~300 nits across a white screen.</td></tr>
+          <tr><td>Contrast ratio</td><td>Brightest white ÷ darkest black. OLED black = 0, so contrast is effectively <b>infinite</b>.</td><td class="mono">"30,000,000:1" is a dynamic-contrast fiction. Native LCD contrast is ~1,000:1 (IPS) to ~7,400:1 (good VA).</td></tr>
+          <tr><td>Colour gamut</td><td>The <b>range</b> of colours shown, as a % of a standard: Rec.709 (HD/SDR), DCI-P3 (HDR cinema target), Rec.2020 (the ultra-wide goal).</td><td class="mono">"100% colour" usually means 100% of the small Rec.709, not the demanding DCI-P3 or Rec.2020.</td></tr>
+          <tr><td>Colour volume</td><td>Gamut <b>plus brightness</b> — can a colour stay saturated as it gets brighter? QD-OLED and RGB-LED excel here.</td><td class="mono">A panel can hit a colour at 200 nits but wash it out at 1,000. Volume catches what flat gamut % hides.</td></tr>
+          <tr><td>Bit depth / 10-bit</td><td>Shades per primary. 8-bit = 16.7M colours; <b>10-bit = ~1.07 billion</b>, needed for smooth HDR gradients.</td><td class="mono">Some "12-bit" sets only accept a 12-bit signal, then display 10-bit. Marketing input ≠ panel output.</td></tr>
+          <tr><td>Local dimming zones</td><td>Independent groups of backlight LEDs in an LCD. More zones = deeper contrast, less haloing. 2025 flagships: thousands.</td><td class="mono">Zone count without algorithm quality is meaningless — and OLED needs zero zones (every pixel dims itself).</td></tr>
+          <tr><td>Refresh rate (Hz)</td><td>Screen updates per second. 60 baseline · 120 for consoles · 144/165/240 for PC gaming.</td><td class="mono">"Motion-rate 240" on a 60Hz panel is interpolation marketing, not a true 240Hz refresh.</td></tr>
+          <tr><td>Response vs input lag</td><td><b>Response time</b> = how fast a pixel changes colour (OLED ≈ 0.03 ms, LCD 1–10 ms). <b>Input lag</b> = controller-to-screen delay.</td><td class="mono">They're different. A fast-response panel can still feel laggy if its processing input lag is high.</td></tr>
+          <tr><td>ABL (auto-brightness limiter)</td><td>Emissive panels dim full-screen bright scenes to manage power and heat — why OLED full white sits far below its small-window peak.</td><td class="mono">It's why a "2,200-nit" OLED shows ~300–360 nits on a full white field. Not a defect — physics.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout--note reveal">
+      <div class="callout__k">The one chart that explains color</div>
+      <p>Colour gamut is best seen, not described. In <strong>Module 06</strong> we plot Rec.709, DCI-P3 and Rec.2020 as nested triangles on the CIE chromaticity diagram — the horseshoe of all colours the human eye can see — and you'll see at a glance how far any real TV gets. Keep the phrase <em>"DCI-P3 is the practical HDR target; Rec.2020 is the someday goal"</em> in your pocket until then.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MODULE 02 — HISTORY ===================== -->
+<section class="module" id="m02">
+  <div class="shell">
+    <div class="module__head reveal">
+      <span class="module__num">MODULE 02 / A SHORT HISTORY</span>
+      <h2 class="module__title">From the cathode ray to the quantum dot</h2>
+      <p class="module__intro">Each technology was a fix for the last one's flaw. CRT had great motion but was a heavy box. Plasma had deep blacks but ran hot. LCD was light and scalable but grey-black. Every leap since has been chasing the same prize: an emissive panel that's also bright, cheap, and durable.</p>
+    </div>
+
+    <figure class="figure figure--wide reveal">
+      <div class="figure__bar">
+        <span class="figure__tag">Figure 02.1 — <b>Six decades</b> of the display lineage</span>
+        <span class="figure__tag">scroll →</span>
+      </div>
+      <div class="figure__body" style="overflow-x:auto">
+        <svg viewBox="0 0 1040 300" width="1040" role="img" aria-label="Timeline of display technology from 1968 LCD principle through 2026 RGB Mini-LED and the MicroLED frontier">
+          <!-- spine -->
+          <rect x="30" y="146" width="980" height="6" rx="3" fill="url(#brightbar)" opacity=".8"/>
+          <defs>
+            <linearGradient id="tlbar" x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0" stop-color="#6b2fb5"/><stop offset=".3" stop-color="#2e6bff"/>
+              <stop offset=".5" stop-color="#1fd2ff"/><stop offset=".7" stop-color="#1fe08a"/>
+              <stop offset=".85" stop-color="#f5b544"/><stop offset="1" stop-color="#ff3b47"/>
+            </linearGradient>
+          </defs>
+          <rect x="30" y="146" width="980" height="6" rx="3" fill="url(#tlbar)"/>
+
+          <!-- nodes: x, year, label, dir(up/down), color -->
+          <!-- helper drawn manually -->
+          <g font-family="'IBM Plex Mono'" font-size="11">
+            <!-- 1968 -->
+            <circle cx="55" cy="149" r="6" fill="#06080d" stroke="#8b6cff" stroke-width="2"/>
+            <line x1="55" y1="143" x2="55" y2="96" stroke="#2a3343"/>
+            <text x="55" y="86" text-anchor="middle" fill="#8b6cff" font-weight="600">1968</text>
+            <text x="55" y="72" text-anchor="middle" fill="#99a2b3" font-family="'IBM Plex Sans'" font-size="11.5">LCD principle</text>
+
+            <!-- 1987 -->
+            <circle cx="165" cy="149" r="6" fill="#06080d" stroke="#4d7cff" stroke-width="2"/>
+            <line x1="165" y1="155" x2="165" y2="200" stroke="#2a3343"/>
+            <text x="165" y="216" text-anchor="middle" fill="#4d7cff" font-weight="600">1987</text>
+            <text x="165" y="230" text-anchor="middle" fill="#99a2b3" font-family="'IBM Plex Sans'" font-size="11.5">OLED invented · Kodak</text>
+
+            <!-- 1997 -->
+            <circle cx="275" cy="149" r="6" fill="#06080d" stroke="#2e6bff" stroke-width="2"/>
+            <line x1="275" y1="143" x2="275" y2="110" stroke="#2a3343"/>
+            <text x="275" y="100" text-anchor="middle" fill="#2e6bff" font-weight="600">1997</text>
+            <text x="275" y="86" text-anchor="middle" fill="#99a2b3" font-family="'IBM Plex Sans'" font-size="11.5">First plasma flat panel</text>
+
+            <!-- 2006 -->
+            <circle cx="385" cy="149" r="6" fill="#06080d" stroke="#1fd2ff" stroke-width="2"/>
+            <line x1="385" y1="155" x2="385" y2="188" stroke="#2a3343"/>
+            <text x="385" y="204" text-anchor="middle" fill="#1fd2ff" font-weight="600">~2006</text>
+            <text x="385" y="218" text-anchor="middle" fill="#99a2b3" font-family="'IBM Plex Sans'" font-size="11.5">LED backlights (LED-LCD)</text>
+
+            <!-- 2013 -->
+            <circle cx="495" cy="149" r="6" fill="#06080d" stroke="#1fe08a" stroke-width="2"/>
+            <line x1="495" y1="143" x2="495" y2="110" stroke="#2a3343"/>
+            <text x="495" y="100" text-anchor="middle" fill="#1fe08a" font-weight="600">2013</text>
+            <text x="495" y="86" text-anchor="middle" fill="#99a2b3" font-family="'IBM Plex Sans'" font-size="11.5">LG ships OLED TV</text>
+
+            <!-- 2017 -->
+            <circle cx="600" cy="149" r="6" fill="#06080d" stroke="#7ee06a" stroke-width="2"/>
+            <line x1="600" y1="155" x2="600" y2="188" stroke="#2a3343"/>
+            <text x="600" y="204" text-anchor="middle" fill="#7ee06a" font-weight="600">2017</text>
+            <text x="600" y="218" text-anchor="middle" fill="#99a2b3" font-family="'IBM Plex Sans'" font-size="11.5">Quantum dots · "QLED"</text>
+
+            <!-- 2021 -->
+            <circle cx="705" cy="149" r="6" fill="#06080d" stroke="#c8e64b" stroke-width="2"/>
+            <line x1="705" y1="143" x2="705" y2="110" stroke="#2a3343"/>
+            <text x="705" y="100" text-anchor="middle" fill="#c8e64b" font-weight="600">2021</text>
+            <text x="705" y="86" text-anchor="middle" fill="#99a2b3" font-family="'IBM Plex Sans'" font-size="11.5">Mini-LED backlights</text>
+
+            <!-- 2022 -->
+            <circle cx="800" cy="149" r="6" fill="#06080d" stroke="#f5b544" stroke-width="2"/>
+            <line x1="800" y1="155" x2="800" y2="188" stroke="#2a3343"/>
+            <text x="800" y="204" text-anchor="middle" fill="#f5b544" font-weight="600">2022</text>
+            <text x="800" y="218" text-anchor="middle" fill="#99a2b3" font-family="'IBM Plex Sans'" font-size="11.5">QD-OLED ships</text>
+
+            <!-- 2025 -->
+            <circle cx="905" cy="149" r="7" fill="#06080d" stroke="#ff7a3c" stroke-width="2.5"/>
+            <line x1="905" y1="142" x2="905" y2="104" stroke="#ff7a3c" stroke-opacity=".5"/>
+            <text x="905" y="94" text-anchor="middle" fill="#ff7a3c" font-weight="600">2025</text>
+            <text x="905" y="80" text-anchor="middle" fill="#e8ecf3" font-family="'IBM Plex Sans'" font-size="11.5">RGB Mini-LED, PHOLED</text>
+            <text x="905" y="66" text-anchor="middle" fill="#e8ecf3" font-family="'IBM Plex Sans'" font-size="11.5">4-stack OLED,</text>
+
+            <!-- 2026+ -->
+            <circle cx="990" cy="149" r="7" fill="#ff3b47" stroke="#ff3b47" stroke-width="2"/>
+            <line x1="990" y1="155" x2="990" y2="188" stroke="#ff3b47" stroke-opacity=".5"/>
+            <text x="990" y="204" text-anchor="middle" fill="#ff3b47" font-weight="600">2026 →</text>
+            <text x="985" y="218" text-anchor="middle" fill="#99a2b3" font-family="'IBM Plex Sans'" font-size="11.5">MicroLED / QDEL</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption class="figure__cap"><b>The pattern:</b> emissive ideas (plasma, OLED) and transmissive ideas (LCD, LED, quantum dots, Mini-LED) have leapfrogged for decades. We're now at the moment where the transmissive camp (RGB Mini-LED) and the emissive camp (four-stack OLED, and the coming MicroLED/QDEL) are both reaching for the same wide-color, high-brightness summit from opposite sides.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===================== MODULE 03 — LCD FAMILY ===================== -->
+<section class="module" id="m03">
+  <div class="shell">
+    <div class="module__head reveal">
+      <span class="module__num">MODULE 03 / THE TRANSMISSIVE FAMILY</span>
+      <h2 class="module__title">LCD, and everything built on top of it</h2>
+      <p class="module__intro">"LED TV," "QLED," "Neo QLED," "Mini-LED," "RGB Mini-LED" — every one of these is a liquid-crystal display with a different backlight or filter bolted on. Here's the family tree, from the cheapest panel in the store to the brightest TV ever measured.</p>
+    </div>
+
+    <div class="prose reveal">
+      <h3>Plain LED-LCD — the foundation</h3>
+      <p>An LED-LCD shines a white or blue LED backlight through the liquid-crystal layer and color filters. The only real variable is <strong>where the LEDs sit</strong>. <em>Edge-lit</em> sets line the LEDs along the panel's rim and spread the light across with a guide plate — cheap and thin, but with weak, blotchy dimming. <em>Direct-lit</em> sets put the LEDs behind the screen; the good ones add <strong>Full-Array Local Dimming (FALD)</strong>, splitting the backlight into independently controlled zones for far better contrast.</p>
+      <p>This is the bottom of the market and also its weak point for longevity: in RTINGS' multi-year stress test, edge-lit LCDs with no local dimming were the <em>least</em> reliable category, with nearly 60% suffering complete or partial failure over the equivalent of a decade of use.</p>
+
+      <h3>QLED — LCD wearing a quantum-dot coat</h3>
+      <p>Around 2017 Samsung popularized the <strong>QLED</strong> name, and it remains the most misunderstood term in the category. A QLED is an LED-LCD with one extra layer: a <strong>Quantum-Dot Enhancement Film (QDEF)</strong>. It is still backlit. It still can't make true black. What the quantum dots do is transform <em>color</em>.</p>
+      <p>Quantum dots are semiconductor nanocrystals just a few nanometres across. Hit one with blue light and it re-emits a single, extremely pure color — and that color is set purely by the dot's <strong>size</strong>. Small ~2 nm dots glow green; larger ~6 nm dots glow red. A blue backlight passing through a film of precisely-sized red and green dots (plus the blue that leaks through) produces a far purer, wider-gamut white than a phosphor LED ever could — roughly 50% more color, pushing past 90% of DCI-P3.</p>
+    </div>
+
+    <figure class="figure figure--wide reveal">
+      <div class="figure__bar">
+        <span class="figure__tag">Figure 03.1 — <b>Why quantum dots win on color</b> · emission spectra compared</span>
+        <span class="figure__tag">power vs wavelength</span>
+      </div>
+      <div class="figure__body">
+        <svg viewBox="0 0 860 360" role="img" aria-label="Two emission spectra: a white LED with a broad messy curve versus quantum dots with three sharp narrow peaks">
+          <defs>
+            <linearGradient id="specStrip" x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0" stop-color="#6b2fb5"/><stop offset=".18" stop-color="#3b30d6"/>
+              <stop offset=".33" stop-color="#2e6bff"/><stop offset=".46" stop-color="#1fd2ff"/>
+              <stop offset=".58" stop-color="#1fe08a"/><stop offset=".72" stop-color="#c8e64b"/>
+              <stop offset=".84" stop-color="#f5b544"/><stop offset="1" stop-color="#ff3b47"/>
+            </linearGradient>
+          </defs>
+          <!-- top: white LED -->
+          <text x="40" y="30" font-family="'Chakra Petch'" font-size="13" font-weight="600" fill="#99a2b3">WHITE-LED BACKLIGHT — broad, muddy, overlapping colours</text>
+          <path d="M40,150 L120,150 Q150,150 165,60 Q180,150 210,150 Q360,150 420,90 Q520,70 620,120 Q720,150 820,150 L820,150"
+                fill="none" stroke="#5c6577" stroke-width="2.5"/>
+          <path d="M40,150 L120,150 Q150,150 165,60 Q180,150 210,150 Q360,150 420,90 Q520,70 620,120 Q720,150 820,150 L820,150 L820,150 L40,150 Z"
+                fill="#5c6577" fill-opacity=".12"/>
+          <line x1="40" y1="150" x2="820" y2="150" stroke="#2a3343"/>
+
+          <!-- bottom: QD -->
+          <text x="40" y="206" font-family="'Chakra Petch'" font-size="13" font-weight="600" fill="#e8ecf3">QUANTUM-DOT CONVERSION — three pure, narrow peaks</text>
+          <!-- blue peak -->
+          <path d="M150,320 Q168,200 186,320 Z" fill="#4d7cff" fill-opacity=".5" stroke="#4d7cff" stroke-width="2"/>
+          <!-- green peak -->
+          <path d="M430,320 Q448,196 466,320 Z" fill="#1fe08a" fill-opacity=".5" stroke="#1fe08a" stroke-width="2"/>
+          <!-- red peak -->
+          <path d="M650,320 Q668,202 686,320 Z" fill="#ff3b47" fill-opacity=".5" stroke="#ff3b47" stroke-width="2"/>
+          <line x1="40" y1="320" x2="820" y2="320" stroke="#2a3343"/>
+
+          <!-- wavelength strip -->
+          <rect x="40" y="330" width="780" height="8" rx="4" fill="url(#specStrip)" opacity=".75"/>
+          <g font-family="'IBM Plex Mono'" font-size="10" fill="#5c6577" text-anchor="middle">
+            <text x="150" y="354">450 nm</text><text x="448" y="354">530 nm</text><text x="668" y="354">630 nm</text>
+            <text x="780" y="354">700 nm</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption class="figure__cap"><b>The takeaway:</b> a white LED smears energy across many wavelengths, so its red, green and blue overlap and dilute. Quantum dots emit in tight, well-separated spikes — purer primaries, and therefore a wider color gamut. This same trick reappears inside QD-OLED in Module 04. Note: first-gen dots used toxic cadmium; today's use indium.</figcaption>
+    </figure>
+
+    <div class="prose reveal">
+      <h3>Mini-LED — shrinking the backlight</h3>
+      <p>The breakthrough of 2021 wasn't a new kind of light, it was a <em>smaller</em> one. Mini-LEDs are backlight LEDs miniaturized to around 0.2 mm, which lets manufacturers pack thousands of them into hundreds-to-thousands of dimming zones. More zones mean the backlight can go bright behind a star and dark behind the night sky around it — dramatically deeper contrast and far less "blooming," the halo that haunts cheaper local-dimming sets.</p>
+      <p>Today's flagships are brightness monsters: the Sony Bravia 9 was measured at ~2,816 nits in its accurate mode, the Hisense U8QG pushes close to 4,000-nit highlights, and the TCL QM9K packs over 6,000 zones. But Mini-LED can never fully escape its transmissive roots: blooming is reduced, not gone; viewing angles still fall off past ~35°; and there is no true per-pixel black. The demo below lets you feel exactly why.</p>
+    </div>
+
+    <figure class="figure figure--wide reveal">
+      <div class="figure__bar">
+        <span class="figure__tag">Figure 03.2 — <b>Interactive</b> · watch blooming shrink as dimming zones multiply</span>
+        <span class="figure__tag">drag / tap</span>
+      </div>
+      <div class="figure__body">
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px" id="bloomBtns">
+          <button class="zbtn" data-z="2">2 zones</button>
+          <button class="zbtn" data-z="16">16 zones</button>
+          <button class="zbtn" data-z="96">96 zones</button>
+          <button class="zbtn" data-z="384">384 zones</button>
+          <button class="zbtn active" data-z="0">OLED · per-pixel</button>
+        </div>
+        <canvas id="bloomCanvas" width="800" height="360" style="width:100%;border-radius:10px;border:1px solid #1f2735;background:#000"></canvas>
+        <div id="bloomLabel" style="font-family:'IBM Plex Mono';font-size:12.5px;color:#99a2b3;margin-top:14px">Showing <b style="color:#2bd9ff">emissive / OLED</b> — each pixel is its own light, so the black around the moon and subtitles is perfectly dark. Zero halo.</div>
+      </div>
+      <figcaption class="figure__cap"><b>What you're seeing:</b> a bright moon and subtitle text on a black field. With few backlight zones, the LCD must raise a whole region's brightness to light the moon — spilling grey light into the surrounding black (blooming). Each step multiplies the zones and tightens the halo, but only the emissive/OLED mode reaches true black. This is the single clearest argument for per-pixel emission.</figcaption>
+    </figure>
+
+    <div class="prose reveal">
+      <h3>RGB Mini-LED & "Micro RGB" — the 2025–2026 leap</h3>
+      <p>The newest idea flips the backlight itself into a color engine. Instead of a blue/white backlight filtered by quantum dots, an <strong>RGB Mini-LED</strong> backlight uses <em>individually controlled red, green and blue mini-LEDs</em>. By tuning the backlight's color region-by-region, these sets achieve enormous color volume on top of LCD's brightness and large-size advantages. The branding is a mess — Hisense <strong>RGB-MiniLED</strong> (formerly "TriChroma"), Samsung <strong>Micro RGB</strong> (sub-100 µm LEDs, hence "Micro" — but it is <span class="accent-m">not</span> MicroLED), Sony <strong>RGB LED</strong>, TCL <strong>RGB Mini-LED</strong> — but the physics is shared.</p>
+    </div>
+
+    <div class="callout callout--note reveal">
+      <div class="callout__k">Record on the bench</div>
+      <p>TechRadar measured Hisense's 116-inch RGB-MiniLED (the 116UX) at <strong>5,441 nits HDR and 6,014 nits SDR</strong>, with a staggering <strong>92.64% BT.2020</strong> color coverage — "by far the highest result I have encountered from any of the hundreds of TVs I have tested." Samsung's 115" Micro RGB claims 100% BT.2020. The catch: these are still LCDs, so they keep LCD's haloing and viewing-angle limits — and they launch huge and brutally expensive (≈ <strong>$30,000</strong> each). RTINGS has dubbed 2026 "the year of RGB Mini-LED," with Sony, TCL and LG all expanding the class.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MODULE 04 — OLED FAMILY ===================== -->
+<section class="module" id="m04">
+  <div class="shell">
+    <div class="module__head reveal">
+      <span class="module__num">MODULE 04 / THE EMISSIVE FAMILY</span>
+      <h2 class="module__title">OLED — and its three rival recipes</h2>
+      <p class="module__intro">Organic LEDs make their own light, one pixel at a time. That single fact buys perfect black, infinite contrast, flawless viewing angles and near-instant motion. The interesting part is the three different ways manufacturers turn that white-or-blue organic glow into red, green and blue — WOLED, four-stack Tandem, and QD-OLED — each with real trade-offs.</p>
+    </div>
+
+    <div class="prose reveal">
+      <h3>The OLED bargain — and its historic price</h3>
+      <p>Every OLED pixel emits light when current flows through organic compounds, so each is independently controlled. Switch it off and it's truly black. The historic costs of this bargain were three: lower full-screen brightness (the <span class="term" data-tip="Auto-Brightness Limiter: emissive panels dim full-screen bright scenes to manage power and heat.">ABL</span> ceiling), the risk of <strong>burn-in</strong> from static content, and a higher price. The story of 2023–2026 is the steady erosion of the first two — and, increasingly, the third.</p>
+    </div>
+
+    <figure class="figure figure--wide reveal">
+      <div class="figure__bar">
+        <span class="figure__tag">Figure 04.1 — <b>Subpixel layouts</b> · the same letter "A", rendered three ways</span>
+        <span class="figure__tag">why text differs</span>
+      </div>
+      <div class="figure__body">
+        <svg viewBox="0 0 860 280" role="img" aria-label="Three subpixel layouts: WOLED with white red green blue stripe, QD-OLED triangular, and standard RGB stripe">
+          <!-- WOLED -->
+          <text x="30" y="28" font-family="'Chakra Petch'" font-size="13" font-weight="600" fill="#f5b544">WOLED  ·  W-R-G-B stripe</text>
+          <g>
+            <rect x="30" y="44" width="14" height="150" fill="#fff"/><rect x="46" y="44" width="14" height="150" fill="#ff3b47"/><rect x="62" y="44" width="14" height="150" fill="#1fe08a"/><rect x="78" y="44" width="14" height="150" fill="#4d7cff"/>
+            <rect x="94" y="44" width="14" height="150" fill="#fff"/><rect x="110" y="44" width="14" height="150" fill="#ff3b47"/><rect x="126" y="44" width="14" height="150" fill="#1fe08a"/><rect x="142" y="44" width="14" height="150" fill="#4d7cff"/>
+            <rect x="158" y="44" width="14" height="150" fill="#fff"/><rect x="174" y="44" width="14" height="150" fill="#ff3b47"/><rect x="190" y="44" width="14" height="150" fill="#1fe08a"/><rect x="206" y="44" width="14" height="150" fill="#4d7cff"/>
+            <rect x="30" y="44" width="190" height="150" fill="none" stroke="#1f2735"/>
+          </g>
+          <text x="30" y="216" font-family="'IBM Plex Mono'" font-size="10.5" fill="#5c6577">Extra WHITE subpixel</text>
+          <text x="30" y="232" font-family="'IBM Plex Mono'" font-size="10.5" fill="#5c6577">→ bright, clean text,</text>
+          <text x="30" y="248" font-family="'IBM Plex Mono'" font-size="10.5" fill="#5c6577">slightly diluted colour</text>
+
+          <!-- QD-OLED triangular -->
+          <text x="330" y="28" font-family="'Chakra Petch'" font-size="13" font-weight="600" fill="#ff4d8d">QD-OLED  ·  triangular RGB</text>
+          <g>
+            <!-- triangular arrangement -->
+            <circle cx="350" cy="70" r="9" fill="#ff3b47"/><circle cx="378" cy="70" r="9" fill="#1fe08a"/><circle cx="364" cy="96" r="9" fill="#4d7cff"/>
+            <circle cx="406" cy="70" r="9" fill="#ff3b47"/><circle cx="434" cy="70" r="9" fill="#1fe08a"/><circle cx="420" cy="96" r="9" fill="#4d7cff"/>
+            <circle cx="462" cy="70" r="9" fill="#ff3b47"/><circle cx="490" cy="70" r="9" fill="#1fe08a"/><circle cx="476" cy="96" r="9" fill="#4d7cff"/>
+            <circle cx="350" cy="130" r="9" fill="#ff3b47"/><circle cx="378" cy="130" r="9" fill="#1fe08a"/><circle cx="364" cy="156" r="9" fill="#4d7cff"/>
+            <circle cx="406" cy="130" r="9" fill="#ff3b47"/><circle cx="434" cy="130" r="9" fill="#1fe08a"/><circle cx="420" cy="156" r="9" fill="#4d7cff"/>
+            <circle cx="462" cy="130" r="9" fill="#ff3b47"/><circle cx="490" cy="130" r="9" fill="#1fe08a"/><circle cx="476" cy="156" r="9" fill="#4d7cff"/>
+            <rect x="330" y="44" width="190" height="150" fill="none" stroke="#1f2735"/>
+          </g>
+          <text x="330" y="216" font-family="'IBM Plex Mono'" font-size="10.5" fill="#5c6577">No white subpixel,</text>
+          <text x="330" y="232" font-family="'IBM Plex Mono'" font-size="10.5" fill="#5c6577">purest colour volume —</text>
+          <text x="330" y="248" font-family="'IBM Plex Mono'" font-size="10.5" fill="#5c6577">can fringe text on PCs</text>
+
+          <!-- RGB stripe -->
+          <text x="630" y="28" font-family="'Chakra Petch'" font-size="13" font-weight="600" fill="#99a2b3">RGB stripe  ·  LCD / MicroLED</text>
+          <g>
+            <rect x="630" y="44" width="18" height="150" fill="#ff3b47"/><rect x="648" y="44" width="18" height="150" fill="#1fe08a"/><rect x="666" y="44" width="18" height="150" fill="#4d7cff"/>
+            <rect x="684" y="44" width="18" height="150" fill="#ff3b47"/><rect x="702" y="44" width="18" height="150" fill="#1fe08a"/><rect x="720" y="44" width="18" height="150" fill="#4d7cff"/>
+            <rect x="738" y="44" width="18" height="150" fill="#ff3b47"/><rect x="756" y="44" width="18" height="150" fill="#1fe08a"/><rect x="774" y="44" width="18" height="150" fill="#4d7cff"/>
+            <rect x="630" y="44" width="162" height="150" fill="none" stroke="#1f2735"/>
+          </g>
+          <text x="630" y="216" font-family="'IBM Plex Mono'" font-size="10.5" fill="#5c6577">Standard even R-G-B —</text>
+          <text x="630" y="232" font-family="'IBM Plex Mono'" font-size="10.5" fill="#5c6577">what most software</text>
+          <text x="630" y="248" font-family="'IBM Plex Mono'" font-size="10.5" fill="#5c6577">expects for sharp text</text>
+        </svg>
+      </div>
+      <figcaption class="figure__cap"><b>Why this matters for monitors:</b> sub-pixel text smoothing (ClearType, macOS) assumes the standard R-G-B stripe. WOLED's extra white sub-pixel and QD-OLED's triangular layout can both cause faint colour fringing on small text — usually invisible at TV viewing distance, occasionally noticeable on a desktop. For movies and gaming it's a non-issue.</figcaption>
+    </figure>
+
+    <div class="prose reveal">
+      <h3>WOLED — LG Display's white-plus-filter approach</h3>
+      <p>In a <strong>WOLED</strong> panel every sub-pixel emits <em>white</em> light, which then passes through red, green, blue — and, uniquely, an extra <strong>white</strong> — sub-pixel/filter. That white sub-pixel boosts brightness and keeps text crisp, but slightly dilutes color saturation, and the color filters waste some light. WOLED's real-world strengths are excellent ambient-light handling (a polarizer plus anti-reflective coatings that cut reflections up to ~30%) and consistent, clean whites. <strong>Micro Lens Array (MLA)</strong>, introduced on the 2023 LG G3, added a microscopic lens layer to recover trapped light for roughly a 30% brightness gain. LG Display makes essentially every WOLED TV panel — used by LG, Sony, Panasonic and Philips — shipping over 12 million OLED TV panels in 2025.</p>
+
+      <h3>Four-stack "Primary RGB Tandem" — the 2025 brightness jump</h3>
+      <p>For 2025, LG Display retired MLA in its flagship and stacked <strong>four</strong> emissive layers instead of three — separate red and green layers each paired with their own blue layer. LG Display claims up to 4,000 nits peak, ~20% better efficiency, and DCI-P3 coverage rising from 98.5% to 99.5%. In calibrated testing, FlatpanelsHD measured the 65" <strong>LG G5</strong> at <em>2,200 nits</em> — a 33% jump over the G4's 1,650 — closing most of the historic brightness gap to LCD. You'll find this panel in the LG G5/M5, Panasonic Z95B and Philips OLED+950. (Note: the 97" G5 is <span class="accent-m">not</span> a four-stack panel.) For 2026, "Primary RGB Tandem 2.0" arrives in the G6 and the 77"/83" C6.</p>
+
+      <h3>QD-OLED — Samsung Display's emissive quantum dots</h3>
+      <p><strong>QD-OLED</strong> fuses OLED's perfect black with the quantum-dot trick from Module 03. A <em>blue</em> OLED layer emits the base light; red and green quantum dots convert part of it, and blue passes straight through. There's no white sub-pixel and no lossy color filter, so quantum dots pass ~99% of the light — giving QD-OLED the <strong>highest color volume</strong> of any TV type and letting colors stay vivid even as they brighten. Samsung Display measures ~84% Rec.2020 versus WOLED's ~75%. The trade-off: QD-OLED omits the polarizer, so in a bright room ambient light can lift its blacks to a faint grey-purple — addressed in 2025 by Samsung's "Glare Free" matte coating on the S95F. Found in the Samsung S95F/S90F and Sony Bravia 8 II.</p>
+    </div>
+
+    <div class="callout callout--warn reveal">
+      <div class="callout__k">Buyer beware — the panel lottery</div>
+      <p>Panel type can change <em>within a single model line</em>, often undisclosed. The 83" Samsung S95F and some S90F sizes ship with LG WOLED panels, not QD-OLED. The 97" LG G5 lacks the four-stack panel. LG's 2026 77"/83" C6 uses the brighter G-series Primary RGB Tandem panel while smaller C6 sizes use standard WOLED. <strong>Always verify the exact size's panel before buying</strong> — two sets with the same model name can be genuinely different displays.</p>
+    </div>
+
+    <div class="prose reveal">
+      <h3>PHOLED — the efficiency breakthrough on deck</h3>
+      <p>Here's a secret of today's OLEDs: their red and green emitters are efficient <em>phosphorescent</em> materials (near 100% internal efficiency), but their <strong>blue</strong> is still inefficient <em>fluorescent</em> material (~25%), because stable blue phosphorescence resisted scientists for two decades. <strong>Universal Display Corp</strong> finally cracked a blue phosphorescent emitter, and in 2025 LG Display verified a commercial "dream OLED" using a hybrid blue stack (fluorescent + phosphorescent), cutting power ~15%. A fully phosphorescent panel could lift efficiency ~25% — meaning brighter, longer-lasting, cooler-running OLEDs. First panels target phones and tablets; TVs and QD-OLED (which is mostly blue emission, so it benefits most) follow.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MODULE 05 — THE FRONTIER ===================== -->
+<section class="module" id="m05">
+  <div class="shell">
+    <div class="module__head reveal">
+      <span class="module__num">MODULE 05 / THE FRONTIER</span>
+      <h2 class="module__title">What comes after OLED</h2>
+      <p class="module__intro">Beyond today's panels lie four technologies that promise OLED's perfection without its compromises — if their makers can solve some genuinely hard physics and manufacturing. Here's what's real, what's hype, and how far off each one is.</p>
+    </div>
+
+    <div class="prose reveal">
+      <h3>True MicroLED — perfect, and perfectly unaffordable</h3>
+      <p>MicroLED is the dream endgame: microscopic <em>inorganic</em> LEDs, self-emissive like OLED but immune to burn-in, capable of 1,000–5,000+ nits and lifespans beyond 100,000 hours. The problem is one word — <strong>mass transfer</strong>. A 4K MicroLED TV needs roughly <em>25 million</em> individual micro-chips placed with near-perfect precision and a yield of 99.9999%+. Today's chips are far larger than the sub-10 µm needed to make it cheap, and die cost alone is 40–50% of the bill of materials.</p>
+    </div>
+
+    <div class="callout callout--warn reveal">
+      <div class="callout__k">The cost reality</div>
+      <p>UBI Research's late-2025 teardown puts a 101-inch MicroLED TV's <strong>bill of materials at ~$52,000</strong>, with panel materials alone accounting for 86% of cost. At retail, Samsung's consumer MicroLED sets run <strong>$90,000 (76")</strong> to <strong>$150,000–$173,500 (114")</strong>. Analysts say a roughly 100× cost reduction — through better yield and vertical integration — is "essential" before MicroLED reaches living rooms. Near-term, the technology's real growth is in tiny AR microdisplays and giant commercial video walls, not TVs. Don't expect a consumer-priced MicroLED TV before ~2027 at the very earliest, and likely later.</p>
+    </div>
+
+    <div class="prose reveal">
+      <h3>QDEL / NanoLED — the real "QLED" of the future</h3>
+      <p>This is the holy grail: quantum dots that emit light <em>directly from electricity</em> — no OLED layer, no backlight. <strong>QDEL</strong> (also called NanoLED or electroluminescent QD) would be self-emissive like OLED, but potentially inkjet-printable, making it cheaper and more durable. BOE, Samsung Display, Sharp and TCL are all developing it. The blocker is <strong>blue quantum-dot lifetime</strong>: today's blue QDs survive only ~100–200 hours at full brightness, versus 20,000+ for red and green. Samsung's 2025 prototypes reached 400 nits and 264 PPI — real progress, but a viable TV is still "a few years" out, realistically late this decade.</p>
+
+      <h3>Perovskite — astonishing color, fragile life</h3>
+      <p>Perovskite nanocrystals emit extraordinarily pure color — lab green perovskite LEDs have hit over 30% efficiency and ~97.7% Rec.2020 coverage, far beyond any shipping display. They could serve either as a next-gen color-conversion layer or as direct-emission PeLEDs. The barrier, again, is operational lifetime — perovskites currently degrade far too fast for a product expected to last a decade. There's unconfirmed speculation that a 2026 TCL flagship uses perovskite quantum dots; treat it as a rumor.</p>
+    </div>
+
+    <figure class="figure figure--wide reveal">
+      <div class="figure__bar">
+        <span class="figure__tag">Figure 05.1 — <b>Readiness map</b> · how close is each frontier technology?</span>
+        <span class="figure__tag">lab → living room</span>
+      </div>
+      <div class="figure__body">
+        <svg viewBox="0 0 960 300" role="img" aria-label="Maturity bars for PHOLED, MicroLED, QDEL and perovskite across stages from lab research to mainstream">
+          <!-- stage axis -->
+          <line x1="60" y1="250" x2="740" y2="250" stroke="#2a3343"/>
+          <g font-family="'IBM Plex Mono'" font-size="10" fill="#5c6577" text-anchor="middle">
+            <text x="120" y="272">Lab</text><text x="290" y="272">Prototype</text>
+            <text x="455" y="272">Pre-commercial</text><text x="620" y="272">Premium ship</text><text x="720" y="272">Mainstream</text>
+          </g>
+          <!-- gridlines -->
+          <g stroke="#141a26"><line x1="205" y1="40" x2="205" y2="250"/><line x1="375" y1="40" x2="375" y2="250"/><line x1="540" y1="40" x2="540" y2="250"/><line x1="700" y1="40" x2="700" y2="250"/></g>
+
+          <!-- PHOLED -->
+          <text x="60" y="54" font-family="'Chakra Petch'" font-size="13" font-weight="600" fill="#f5b544">PHOLED</text>
+          <rect x="60" y="62" width="645" height="13" rx="6.5" fill="#f5b544" fill-opacity=".18"/>
+          <rect x="60" y="62" width="645" height="13" rx="6.5" fill="url(#tlbar)" opacity=".5"/>
+          <circle cx="705" cy="68" r="7" fill="#f5b544"/><text x="720" y="72" font-family="'IBM Plex Mono'" font-size="10" fill="#99a2b3">ships in phones, 2025–26</text>
+
+          <!-- MicroLED -->
+          <text x="60" y="104" font-family="'Chakra Petch'" font-size="13" font-weight="600" fill="#1fe08a">MicroLED</text>
+          <rect x="60" y="112" width="600" height="13" rx="6.5" fill="#1fe08a" fill-opacity=".18"/>
+          <rect x="60" y="112" width="600" height="13" rx="6.5" fill="url(#tlbar)" opacity=".5"/>
+          <circle cx="660" cy="118" r="7" fill="#1fe08a"/><text x="675" y="122" font-family="'IBM Plex Mono'" font-size="10" fill="#99a2b3">ships — at $90k+ luxury prices</text>
+
+          <!-- QDEL -->
+          <text x="60" y="154" font-family="'Chakra Petch'" font-size="13" font-weight="600" fill="#ff4d8d">QDEL / NanoLED</text>
+          <rect x="60" y="162" width="440" height="13" rx="6.5" fill="#ff4d8d" fill-opacity=".18"/>
+          <rect x="60" y="162" width="440" height="13" rx="6.5" fill="url(#tlbar)" opacity=".5"/>
+          <circle cx="500" cy="168" r="7" fill="#ff4d8d"/><text x="515" y="172" font-family="'IBM Plex Mono'" font-size="10" fill="#99a2b3">prototypes ~400 nits; blue lifetime gates it</text>
+
+          <!-- Perovskite -->
+          <text x="60" y="204" font-family="'Chakra Petch'" font-size="13" font-weight="600" fill="#8b6cff">Perovskite</text>
+          <rect x="60" y="212" width="270" height="13" rx="6.5" fill="#8b6cff" fill-opacity=".18"/>
+          <rect x="60" y="212" width="270" height="13" rx="6.5" fill="url(#tlbar)" opacity=".5"/>
+          <circle cx="330" cy="218" r="7" fill="#8b6cff"/><text x="345" y="222" font-family="'IBM Plex Mono'" font-size="10" fill="#99a2b3">lab-stage; lifetime far too short</text>
+        </svg>
+      </div>
+      <figcaption class="figure__cap"><b>Reading the map:</b> PHOLED is essentially here (in small devices). MicroLED ships but only as a five-figure luxury. QDEL and perovskite remain gated by fundamental materials problems — chiefly the short life of blue emitters. For anyone buying a TV in 2025–2026, the practical contest is still OLED versus Mini-LED.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===================== MODULE 06 — HEAD TO HEAD ===================== -->
+<section class="module" id="m06">
+  <div class="shell">
+    <div class="module__head reveal">
+      <span class="module__num">MODULE 06 / HEAD TO HEAD</span>
+      <h2 class="module__title">The data, side by side</h2>
+      <p class="module__intro">Enough theory. Here is where the technologies actually land on the measurements that matter — color, brightness, motion, longevity — and a single matrix you can use to settle most arguments.</p>
+    </div>
+
+    <div class="prose reveal">
+      <h3>Color, made visible — the CIE chromaticity diagram</h3>
+      <p>This horseshoe contains every color a human eye can see. The three triangles are the color <em>standards</em>: each can only reproduce colors inside its bounds. <strong>Rec.709</strong> is the old HD/SDR box. <strong>DCI-P3</strong> is the practical target all good HDR content is mastered to — and top displays now cover ~99% of it. <strong>Rec.2020</strong> is the vast someday-goal that even the best 2025 sets only reach ~75–92% of.</p>
+    </div>
+
+    <figure class="figure reveal">
+      <div class="figure__bar">
+        <span class="figure__tag">Figure 06.1 — <b>CIE 1931</b> · the color standards every TV is measured against</span>
+        <span class="figure__tag">x,y chromaticity</span>
+      </div>
+      <div class="figure__body">
+        <svg viewBox="0 0 700 620" role="img" aria-label="CIE 1931 chromaticity diagram showing the spectral locus with Rec.709, DCI-P3 and Rec.2020 gamut triangles">
+          <defs>
+            <clipPath id="locusClip">
+              <path d="M201.87,577 L180.8,562.18 L166.87,545.32 L143.91,500.38 L111.78,403 L85.74,256.96 L89.73,129.88 L132.01,79.72 L188.29,96.46 L240.72,127.42 L291.12,164.62 L341.17,205.3 L390.87,247.18 L438.75,288.04 L482.64,325.48 L518.9,356.5 L546.06,379.6 L564.05,395.02 L575.53,404.8 L583.3,411.46 L588.2,415.6 L594.29,420.82 L201.87,577 Z"/>
+            </clipPath>
+          </defs>
+
+          <!-- axes -->
+          <g stroke="#1f2735" stroke-width="1">
+            <line x1="80" y1="580" x2="660" y2="580"/>
+            <line x1="80" y1="580" x2="80" y2="30"/>
+          </g>
+          <g font-family="'IBM Plex Mono'" font-size="10" fill="#5c6577">
+            <text x="370" y="610" text-anchor="middle">CIE x</text>
+            <text x="30" y="300" text-anchor="middle" transform="rotate(-90,30,300)">CIE y</text>
+            <text x="80" y="600" text-anchor="middle">0</text>
+            <text x="430" y="600" text-anchor="middle">0.5</text>
+            <text x="640" y="600" text-anchor="middle">0.8</text>
+            <text x="64" y="584" text-anchor="end">0</text>
+            <text x="64" y="280" text-anchor="end">0.5</text>
+            <text x="64" y="44" text-anchor="end">0.9</text>
+          </g>
+
+          <!-- color blobs clipped to locus -->
+          <g clip-path="url(#locusClip)" opacity=".62">
+            <rect x="80" y="30" width="580" height="550" fill="#0a0e16"/>
+            <circle cx="150" cy="130" r="200" fill="#1fe08a"/>
+            <circle cx="110" cy="280" r="150" fill="#1fd2ff"/>
+            <circle cx="200" cy="520" r="150" fill="#3b30d6"/>
+            <circle cx="300" cy="560" r="120" fill="#8b3bd6"/>
+            <circle cx="430" cy="300" r="200" fill="#c8e64b"/>
+            <circle cx="540" cy="400" r="200" fill="#ff7a3c"/>
+            <circle cx="595" cy="420" r="120" fill="#ff3b47"/>
+            <circle cx="500" cy="360" r="120" fill="#f5b544"/>
+          </g>
+          <!-- locus outline -->
+          <path d="M201.87,577 L180.8,562.18 L166.87,545.32 L143.91,500.38 L111.78,403 L85.74,256.96 L89.73,129.88 L132.01,79.72 L188.29,96.46 L240.72,127.42 L291.12,164.62 L341.17,205.3 L390.87,247.18 L438.75,288.04 L482.64,325.48 L518.9,356.5 L546.06,379.6 L564.05,395.02 L575.53,404.8 L583.3,411.46 L588.2,415.6 L594.29,420.82 L201.87,577 Z"
+                fill="none" stroke="#3a4456" stroke-width="1.5"/>
+
+          <!-- Rec.2020 triangle -->
+          <polygon points="575.6,404.8 199,101.8 171.7,552.4" fill="none" stroke="#ff3b47" stroke-width="2" stroke-dasharray="7 5"/>
+          <!-- DCI-P3 -->
+          <polygon points="556,388 265.5,166 185,544" fill="none" stroke="#f5b544" stroke-width="2"/>
+          <!-- Rec.709 -->
+          <polygon points="528,382 290,220 185,544" fill="none" stroke="#9fb0c8" stroke-width="2"/>
+
+          <!-- white point -->
+          <circle cx="298.89" cy="382.6" r="4" fill="#fff"/><circle cx="298.89" cy="382.6" r="8" fill="none" stroke="#fff" stroke-opacity=".4"/>
+          <text x="308" y="378" font-family="'IBM Plex Mono'" font-size="10" fill="#e8ecf3">D65 white</text>
+
+          <!-- legend -->
+          <g font-family="'IBM Plex Sans'" font-size="13">
+            <rect x="430" y="60" width="220" height="96" rx="8" fill="#0e121b" stroke="#1f2735"/>
+            <line x1="446" y1="84" x2="470" y2="84" stroke="#9fb0c8" stroke-width="2"/><text x="478" y="88" fill="#c6cedb">Rec.709 — SDR / HD</text>
+            <line x1="446" y1="110" x2="470" y2="110" stroke="#f5b544" stroke-width="2"/><text x="478" y="114" fill="#c6cedb">DCI-P3 — HDR target</text>
+            <line x1="446" y1="136" x2="470" y2="136" stroke="#ff3b47" stroke-width="2" stroke-dasharray="7 5"/><text x="478" y="140" fill="#c6cedb">Rec.2020 — the goal</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption class="figure__cap"><b>How to use it:</b> bigger triangle = more colors. Notice how much of the green region lies <em>outside</em> even Rec.2020's reach — pure greens are the hardest for any display. The leap from Rec.709 to DCI-P3 is the one you actually see in HDR; the further push to Rec.2020 is what RGB Mini-LED and next-gen quantum dots are chasing, though most content can't yet use it.</figcaption>
+    </figure>
+
+    <div class="prose reveal">
+      <h3>Brightness — measured, not marketed</h3>
+      <p>Manufacturer nit claims are fantasy figures from "Vivid" modes. Below are <em>calibrated</em> peak-brightness measurements from independent labs, on a small (~10%) window. Watch two things: how far the four-stack OLED and QD-OLED have closed the gap, and how the RGB Mini-LED simply runs off the top of the chart.</p>
+    </div>
+
+    <figure class="figure figure--wide reveal">
+      <div class="figure__bar">
+        <span class="figure__tag">Figure 06.2 — <b>Peak HDR brightness</b> · calibrated, ~10% window, nits</span>
+        <span class="figure__tag">hover for detail</span>
+      </div>
+      <div class="figure__body">
+        <svg viewBox="0 0 860 420" role="img" aria-label="Bar chart of peak HDR brightness from LG C5 at 1180 nits up to Hisense 116UX RGB Mini-LED at 5441 nits">
+          <!-- y gridlines (scale max 6000 -> 300px plot, baseline y=360, top y=60) -->
+          <g font-family="'IBM Plex Mono'" font-size="10" fill="#5c6577">
+            <line x1="120" y1="360" x2="840" y2="360" stroke="#2a3343"/>
+            <line x1="120" y1="300" x2="840" y2="300" stroke="#141a26"/><text x="112" y="304" text-anchor="end">1,000</text>
+            <line x1="120" y1="260" x2="840" y2="260" stroke="#141a26"/><text x="112" y="264" text-anchor="end">2,000</text>
+            <line x1="120" y1="210" x2="840" y2="210" stroke="#141a26"/><text x="112" y="214" text-anchor="end">3,000</text>
+            <line x1="120" y1="160" x2="840" y2="160" stroke="#141a26"/><text x="112" y="164" text-anchor="end">4,000</text>
+            <line x1="120" y1="110" x2="840" y2="110" stroke="#141a26"/><text x="112" y="114" text-anchor="end">5,000</text>
+            <line x1="120" y1="60" x2="840" y2="60" stroke="#141a26"/><text x="112" y="64" text-anchor="end">6,000</text>
+            <text x="112" y="364" text-anchor="end">0</text>
+          </g>
+          <!-- bars: scale = 0.05 px/nit. baseline 360 -->
+          <!-- C5 1180 -> h59 -->
+          <g class="bar" data-name="LG C5 · WOLED (mid-range)" data-val="1,180 nits measured">
+            <rect x="150" y="301" width="64" height="59" rx="3" fill="#f5b544" fill-opacity=".55" stroke="#f5b544"/>
+          </g>
+          <!-- G5 2200 measured, claim 4000 ghost(h200 top y160) -->
+          <g class="bar" data-name="LG G5 · 4-stack OLED" data-val="2,200 nits measured · 4,000 claimed">
+            <rect x="244" y="160" width="64" height="200" rx="3" fill="none" stroke="#f5b544" stroke-opacity=".35" stroke-dasharray="4 4"/>
+            <rect x="244" y="250" width="64" height="110" rx="3" fill="#f5b544" fill-opacity=".55" stroke="#f5b544"/>
+          </g>
+          <!-- S95F 2100 measured, peak 3600 ghost(h180 y180) -->
+          <g class="bar" data-name="Samsung S95F · QD-OLED" data-val="2,100 nits calibrated · 3,600 peak">
+            <rect x="338" y="180" width="64" height="180" rx="3" fill="none" stroke="#ff4d8d" stroke-opacity=".35" stroke-dasharray="4 4"/>
+            <rect x="338" y="255" width="64" height="105" rx="3" fill="#ff4d8d" fill-opacity=".5" stroke="#ff4d8d"/>
+          </g>
+          <!-- Bravia9 2816 -> h141 y219 -->
+          <g class="bar" data-name="Sony Bravia 9 · Mini-LED" data-val="2,816 nits (accurate mode)">
+            <rect x="432" y="219" width="64" height="141" rx="3" fill="#4d7cff" fill-opacity=".5" stroke="#4d7cff"/>
+          </g>
+          <!-- U8QG 4000 -> h200 y160 -->
+          <g class="bar" data-name="Hisense U8QG · Mini-LED" data-val="≈4,000 nits highlights">
+            <rect x="526" y="160" width="64" height="200" rx="3" fill="#4d7cff" fill-opacity=".5" stroke="#4d7cff"/>
+          </g>
+          <!-- TCL QM9K 5000 claim -> h250 y110 (mark as claimed) -->
+          <g class="bar" data-name="TCL QM9K · Mini-LED" data-val="≈5,000 nits (claimed)">
+            <rect x="620" y="110" width="64" height="250" rx="3" fill="#4d7cff" fill-opacity=".3" stroke="#4d7cff" stroke-dasharray="4 4"/>
+          </g>
+          <!-- 116UX 5441 -> h272 y88 ; claim 8000 arrow -->
+          <g class="bar" data-name="Hisense 116UX · RGB Mini-LED" data-val="5,441 nits measured · 8,000 claimed">
+            <rect x="714" y="88" width="64" height="272" rx="3" fill="#2bd9ff" fill-opacity=".6" stroke="#2bd9ff"/>
+            <path d="M746,88 L746,66" stroke="#2bd9ff" stroke-width="2" marker-end="url(#ah)"/>
+            <text x="746" y="58" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="9" fill="#2bd9ff">→8,000</text>
+          </g>
+
+          <!-- x labels -->
+          <g font-family="'IBM Plex Mono'" font-size="9.5" fill="#99a2b3" text-anchor="middle">
+            <text x="182" y="378">LG C5</text>
+            <text x="276" y="378">LG G5</text>
+            <text x="370" y="378">S95F</text>
+            <text x="464" y="378">Bravia 9</text>
+            <text x="558" y="378">U8QG</text>
+            <text x="652" y="378">QM9K</text>
+            <text x="746" y="378">116UX</text>
+          </g>
+          <!-- value labels on bars -->
+          <g font-family="'Chakra Petch'" font-size="11" font-weight="600" fill="#e8ecf3" text-anchor="middle">
+            <text x="182" y="294">1180</text><text x="276" y="244">2200</text><text x="370" y="249">2100</text>
+            <text x="464" y="213">2816</text><text x="558" y="154">4000</text><text x="652" y="104" fill="#7e92b8">5000*</text><text x="746" y="104" fill="#2bd9ff">5441</text>
+          </g>
+          <!-- legend -->
+          <g font-family="'IBM Plex Sans'" font-size="11" fill="#99a2b3">
+            <rect x="150" y="392" width="11" height="11" fill="#f5b544" fill-opacity=".55"/><text x="167" y="402">OLED</text>
+            <rect x="230" y="392" width="11" height="11" fill="#ff4d8d" fill-opacity=".5"/><text x="247" y="402">QD-OLED</text>
+            <rect x="330" y="392" width="11" height="11" fill="#4d7cff" fill-opacity=".5"/><text x="347" y="402">Mini-LED</text>
+            <rect x="430" y="392" width="11" height="11" fill="#2bd9ff" fill-opacity=".6"/><text x="447" y="402">RGB Mini-LED</text>
+            <text x="560" y="402" fill="#5c6577">dashed = claimed / peak · * = manufacturer figure</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption class="figure__cap"><b>The full-screen catch:</b> these are small-window peaks. Thanks to ABL, the OLEDs sustain only ~360 nits (G5) or ~195 nits (C5) across a <em>full white screen</em>, where Mini-LEDs hold 1,000+ nits. So OLED wins highlights-in-darkness; LCD wins bright full-field content like sports and HDR snow. Sources: FlatpanelsHD, AVForums, Tom's Guide, TechRadar.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===================== MODULE 06 — PART 2 ===================== -->
+<section class="module" id="m06b" style="padding-top:30px">
+  <div class="shell">
+    <div class="prose reveal">
+      <h3>The master matrix</h3>
+      <p>Every technology, every dimension, one table. Fuller bar = better. "Burn-in resistance" is framed so higher is always better, keeping the whole grid intuitive: the more green you see in a column, the stronger that technology. Read down a column for a technology's character; read across a row to see who wins a given trait.</p>
+    </div>
+
+    <div class="tbl-wrap reveal">
+      <table class="data" style="min-width:920px">
+        <thead>
+          <tr>
+            <th style="min-width:150px">Trait</th>
+            <th>LED-LCD</th><th>QLED</th><th>Mini-LED</th><th>RGB&nbsp;Mini-LED</th>
+            <th>WOLED</th><th>4-Stack&nbsp;OLED</th><th>QD-OLED</th><th>MicroLED</th>
+          </tr>
+        </thead>
+        <tbody id="matrix"></tbody>
+      </table>
+    </div>
+    <p style="font-size:12.5px;color:var(--faint);font-family:'IBM Plex Mono',monospace;margin-top:-14px">
+      Scale 1–5, synthesised from RTINGS / FlatpanelsHD / HDTVTest measurements and category characteristics. "Value" weights picture-per-dollar, so MicroLED scores low despite flawless image.
+    </p>
+
+    <div class="prose reveal">
+      <h3>Motion — why OLED looks cleaner at lower numbers</h3>
+      <p>An OLED pixel changes state in about <strong>0.03 ms</strong>; a typical LCD pixel takes <strong>1–10 ms</strong>. That gap means a 240 Hz OLED often resolves motion more cleanly than a 360 Hz LCD, because the LCD's slow gray-to-gray transition eats into each frame. Both share one enemy — sample-and-hold persistence blur — which only higher refresh rates or black-frame insertion truly cut.</p>
+    </div>
+
+    <figure class="figure figure--wide reveal">
+      <div class="figure__bar">
+        <span class="figure__tag">Figure 06.3 — <b>Pixel response time</b> · lower is sharper motion (ms, log)</span>
+        <span class="figure__tag">OLED vs LCD</span>
+      </div>
+      <div class="figure__body">
+        <svg viewBox="0 0 860 190" role="img" aria-label="Pixel response time comparison: OLED 0.03ms versus LCD 1 to 10ms">
+          <g font-family="'IBM Plex Mono'" font-size="11" fill="#99a2b3">
+            <text x="20" y="50">OLED</text>
+            <text x="20" y="110">LCD (fast VA/IPS)</text>
+            <text x="20" y="150">LCD (slow VA)</text>
+          </g>
+          <!-- baseline -->
+          <line x1="180" y1="170" x2="840" y2="170" stroke="#2a3343"/>
+          <!-- log-ish scale: 0.01ms..16ms mapped 180..840 ; ticks -->
+          <g font-family="'IBM Plex Mono'" font-size="9.5" fill="#5c6577" text-anchor="middle">
+            <text x="180" y="186">0.01</text><text x="312" y="186">0.1</text><text x="444" y="186">1</text><text x="576" y="186">4</text><text x="708" y="186">8</text><text x="840" y="186">16 ms</text>
+          </g>
+          <!-- OLED 0.03ms -> ~ x where log10(0.03)... map log10 from -2(180) to 1.2(840): span 1020/3.2=318.75/decade. 0.03 => log -1.523 => 180+ (0.477*318.75)=332 -->
+          <rect x="180" y="34" width="155" height="22" rx="4" fill="#1fe08a" fill-opacity=".55" stroke="#1fe08a"/>
+          <text x="345" y="50" font-family="'Chakra Petch'" font-size="11" fill="#1fe08a">≈0.03 ms — effectively instant</text>
+          <!-- LCD fast ~1ms -> log0=180+2*318.75=817? wait recompute: log10(1)=0 -> 180+(0-(-2))*318.75=180+637.5=817 too far. Use range -2..1.2 => total 3.2 decades over 660px =206.25/decade. redo ticks accordingly -->
+          <!-- Simpler linear-ish blocks for clarity -->
+          <rect x="180" y="94" width="150" height="22" rx="4" fill="#4d7cff" fill-opacity=".5" stroke="#4d7cff"/>
+          <text x="340" y="110" font-family="'Chakra Petch'" font-size="11" fill="#7aa0ff">≈1 ms</text>
+          <rect x="180" y="134" width="430" height="22" rx="4" fill="#4d7cff" fill-opacity=".3" stroke="#4d7cff" stroke-dasharray="4 4"/>
+          <text x="620" y="150" font-family="'Chakra Petch'" font-size="11" fill="#7aa0ff">up to ≈10 ms — visible smearing</text>
+        </svg>
+      </div>
+      <figcaption class="figure__cap">Note: the axis ticks are indicative. The point is the order-of-magnitude gap — OLED's response is so far below one frame's duration that pixel transitions never limit its motion; the LCD's can.</figcaption>
+    </figure>
+
+    <div class="prose reveal">
+      <h3>Burn-in & longevity — the real-world verdict</h3>
+      <p>RTINGS ran 102 TVs continuously for nearly three years — about 18,000 hours, the equivalent of over a decade of normal viewing. The result overturns the common fear that OLED is fragile.</p>
+    </div>
+
+    <figure class="figure figure--wide reveal">
+      <div class="figure__bar">
+        <span class="figure__tag">Figure 06.4 — <b>RTINGS longevity test</b> · 102 TVs · ~18,000 hours</span>
+        <span class="figure__tag">accelerated</span>
+      </div>
+      <div class="figure__body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:18px;margin-bottom:8px">
+          <div style="text-align:center;padding:18px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2)">
+            <div style="font-family:'Chakra Petch';font-size:2.2rem;font-weight:700;color:var(--text)">102</div>
+            <div style="font-family:'IBM Plex Mono';font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.1em">TVs tested</div>
+          </div>
+          <div style="text-align:center;padding:18px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2)">
+            <div style="font-family:'Chakra Petch';font-size:2.2rem;font-weight:700;color:var(--red)">20</div>
+            <div style="font-family:'IBM Plex Mono';font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.1em">Complete failures</div>
+          </div>
+          <div style="text-align:center;padding:18px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2)">
+            <div style="font-family:'Chakra Petch';font-size:2.2rem;font-weight:700;color:var(--amber)">24</div>
+            <div style="font-family:'IBM Plex Mono';font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.1em">Partial failures</div>
+          </div>
+          <div style="text-align:center;padding:18px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2)">
+            <div style="font-family:'Chakra Petch';font-size:2.2rem;font-weight:700;color:var(--green)">OLED</div>
+            <div style="font-family:'IBM Plex Mono';font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.1em">Most reliable type</div>
+          </div>
+        </div>
+      </div>
+      <figcaption class="figure__cap"><b>The findings:</b> OLEDs had the <em>fewest</em> failures and the longest lifespan — only 1 of 24 LG OLEDs failed outright. The single most common fault across all sets was a failed <strong>LED backlight</strong> (34% of LED models), and nearly 60% of edge-lit LCDs failed completely or partially. OLED burn-in did appear under this torture test, but RTINGS concluded it "won't be an issue" with varied real-world content. Inorganic MicroLED is essentially immune. Source: RTINGS / FlatpanelsHD.</figcaption>
+    </figure>
+
+    <div class="prose reveal">
+      <h3>The right tech for how you actually watch</h3>
+    </div>
+    <div class="usecase reveal" id="usecases"></div>
+  </div>
+</section>
+
+<!-- ===================== MODULE 07 — COST ===================== -->
+<section class="module" id="m07">
+  <div class="shell">
+    <div class="module__head reveal">
+      <span class="module__num">MODULE 07 / WHAT IT COSTS</span>
+      <h2 class="module__title">Follow the money</h2>
+      <p class="module__intro">Picture quality is only half the decision. Here's what each technology actually costs in 2025–2026 — by size, by class, and across the full absurd range from a $300 budget LCD to a $173,500 MicroLED — plus the running costs nobody puts on the box.</p>
+    </div>
+
+    <div class="prose reveal">
+      <h3>Price by size — the three tiers that matter</h3>
+      <p>Most buyers are choosing between a value OLED (LG C5), a flagship OLED (LG G5 / Samsung S95F), and they want to know how the premium scales with size. Notice that prices don't rise linearly — the jump from 65" to 77" is the cliff, because large OLED panels have far lower manufacturing yields.</p>
+    </div>
+
+    <figure class="figure figure--wide reveal">
+      <div class="figure__bar">
+        <span class="figure__tag">Figure 07.1 — <b>Street price by screen size</b> · approx USD, 2025–26</span>
+        <span class="figure__tag">hover for detail</span>
+      </div>
+      <div class="figure__body">
+        <svg viewBox="0 0 860 360" role="img" aria-label="Grouped bar chart of LG C5, LG G5 and Samsung S95F prices at 55, 65, 77 and 83 inches">
+          <!-- gridlines: scale 0.04528 px/$, baseline y300 top y60 -->
+          <g font-family="'IBM Plex Mono'" font-size="10" fill="#5c6577">
+            <line x1="100" y1="300" x2="840" y2="300" stroke="#2a3343"/>
+            <line x1="100" y1="255" x2="840" y2="255" stroke="#141a26"/><text x="92" y="259" text-anchor="end">$1k</text>
+            <line x1="100" y1="209" x2="840" y2="209" stroke="#141a26"/><text x="92" y="213" text-anchor="end">$2k</text>
+            <line x1="100" y1="164" x2="840" y2="164" stroke="#141a26"/><text x="92" y="168" text-anchor="end">$3k</text>
+            <line x1="100" y1="119" x2="840" y2="119" stroke="#141a26"/><text x="92" y="123" text-anchor="end">$4k</text>
+            <line x1="100" y1="74" x2="840" y2="74" stroke="#141a26"/><text x="92" y="78" text-anchor="end">$5k</text>
+            <text x="92" y="304" text-anchor="end">0</text>
+          </g>
+          <!-- bars -->
+          <g>
+            <!-- 55 -->
+            <rect class="bar" data-name="LG C5 · 55-inch" data-val="≈ $1,300" x="120" y="241" width="36" height="59" rx="3" fill="#f5b544" fill-opacity=".6" stroke="#f5b544"/>
+            <rect class="bar" data-name="LG G5 · 55-inch" data-val="≈ $2,500" x="162" y="187" width="36" height="113" rx="3" fill="#2bd9ff" fill-opacity=".55" stroke="#2bd9ff"/>
+            <rect class="bar" data-name="Samsung S95F · 55-inch" data-val="≈ $1,850" x="204" y="216" width="36" height="84" rx="3" fill="#ff4d8d" fill-opacity=".5" stroke="#ff4d8d"/>
+            <!-- 65 -->
+            <rect class="bar" data-name="LG C5 · 65-inch" data-val="≈ $1,400" x="300" y="237" width="36" height="63" rx="3" fill="#f5b544" fill-opacity=".6" stroke="#f5b544"/>
+            <rect class="bar" data-name="LG G5 · 65-inch" data-val="≈ $2,300" x="342" y="196" width="36" height="104" rx="3" fill="#2bd9ff" fill-opacity=".55" stroke="#2bd9ff"/>
+            <rect class="bar" data-name="Samsung S95F · 65-inch" data-val="≈ $2,300" x="384" y="196" width="36" height="104" rx="3" fill="#ff4d8d" fill-opacity=".5" stroke="#ff4d8d"/>
+            <!-- 77 -->
+            <rect class="bar" data-name="LG C5 · 77-inch" data-val="≈ $2,600" x="480" y="182" width="36" height="118" rx="3" fill="#f5b544" fill-opacity=".6" stroke="#f5b544"/>
+            <rect class="bar" data-name="LG G5 · 77-inch" data-val="≈ $3,500" x="522" y="142" width="36" height="158" rx="3" fill="#2bd9ff" fill-opacity=".55" stroke="#2bd9ff"/>
+            <rect class="bar" data-name="Samsung S95F · 77-inch" data-val="≈ $3,700" x="564" y="133" width="36" height="167" rx="3" fill="#ff4d8d" fill-opacity=".5" stroke="#ff4d8d"/>
+            <!-- 83 -->
+            <rect class="bar" data-name="LG C5 · 83-inch" data-val="≈ $4,000" x="660" y="119" width="36" height="181" rx="3" fill="#f5b544" fill-opacity=".6" stroke="#f5b544"/>
+            <rect class="bar" data-name="LG G5 · 83-inch" data-val="≈ $5,000" x="702" y="74" width="36" height="226" rx="3" fill="#2bd9ff" fill-opacity=".55" stroke="#2bd9ff"/>
+            <rect class="bar" data-name="Samsung S95F · 83-inch" data-val="≈ $5,300 (WOLED panel)" x="744" y="60" width="36" height="240" rx="3" fill="#ff4d8d" fill-opacity=".5" stroke="#ff4d8d"/>
+          </g>
+          <!-- x labels -->
+          <g font-family="'Chakra Petch'" font-size="13" font-weight="600" fill="#99a2b3" text-anchor="middle">
+            <text x="180" y="324">55"</text><text x="360" y="324">65"</text><text x="540" y="324">77"</text><text x="720" y="324">83"</text>
+          </g>
+          <!-- legend -->
+          <g font-family="'IBM Plex Sans'" font-size="12" fill="#99a2b3">
+            <rect x="120" y="338" width="12" height="12" fill="#f5b544" fill-opacity=".6"/><text x="138" y="349">LG C5 (value WOLED)</text>
+            <rect x="320" y="338" width="12" height="12" fill="#2bd9ff" fill-opacity=".55"/><text x="338" y="349">LG G5 (4-stack)</text>
+            <rect x="520" y="338" width="12" height="12" fill="#ff4d8d" fill-opacity=".5"/><text x="538" y="349">Samsung S95F (QD-OLED)</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption class="figure__cap">Approximate US street/sale prices, mid-2025 to mid-2026 — these move constantly as new models arrive. The C5 consistently undercuts the flagships by 30–45% for picture quality most viewers can't distinguish from across the room.</figcaption>
+    </figure>
+
+    <div class="prose reveal">
+      <h3>The full price spectrum — a 580× range</h3>
+      <p>Here is the entire consumer landscape on one logarithmic axis. The distance from a perfectly good budget set to the bleeding edge isn't a gap — it's a chasm. And almost everything a normal person should consider lives in the leftmost third.</p>
+    </div>
+
+    <figure class="figure figure--wide reveal">
+      <div class="figure__bar">
+        <span class="figure__tag">Figure 07.2 — <b>The cost spectrum</b> · 65-inch class where possible, log scale</span>
+        <span class="figure__tag">$300 → $175,000</span>
+      </div>
+      <div class="figure__body">
+        <svg viewBox="0 0 880 300" role="img" aria-label="Logarithmic price spectrum from 300 dollar budget LCD to 175000 dollar MicroLED">
+          <!-- track -->
+          <rect x="60" y="150" width="760" height="10" rx="5" fill="url(#tlbar)"/>
+          <!-- decade ticks: $300,1k,3k,10k,30k,100k -->
+          <g font-family="'IBM Plex Mono'" font-size="10" fill="#5c6577" text-anchor="middle">
+            <line x1="60" y1="160" x2="60" y2="172" stroke="#2a3343"/><text x="60" y="186">$300</text>
+            <line x1="203.6" y1="160" x2="203.6" y2="172" stroke="#2a3343"/><text x="203.6" y="186">$1k</text>
+            <line x1="335" y1="160" x2="335" y2="172" stroke="#2a3343"/><text x="335" y="186">$3k</text>
+            <line x1="478" y1="160" x2="478" y2="172" stroke="#2a3343"/><text x="478" y="186">$10k</text>
+            <line x1="609.5" y1="160" x2="609.5" y2="172" stroke="#2a3343"/><text x="609.5" y="186">$30k</text>
+            <line x1="753" y1="160" x2="753" y2="172" stroke="#2a3343"/><text x="753" y="186">$100k</text>
+          </g>
+          <!-- markers above (alternating) -->
+          <g font-family="'IBM Plex Sans'" font-size="11.5">
+            <!-- budget LCD 0% x60 -->
+            <circle cx="60" cy="155" r="5" fill="#6b2fb5" stroke="#06080d" stroke-width="1.5"/>
+            <line x1="60" y1="150" x2="60" y2="120" stroke="#2a3343"/><text x="60" y="112" text-anchor="middle" fill="#c6cedb">Budget LCD</text>
+            <!-- budget OLED B5 10.9% x142.8 below -->
+            <circle cx="142.8" cy="155" r="5" fill="#3b30d6" stroke="#06080d" stroke-width="1.5"/>
+            <line x1="142.8" y1="160" x2="142.8" y2="212" stroke="#2a3343"/><text x="142.8" y="226" text-anchor="middle" fill="#c6cedb">OLED B5 (48") ~$600</text>
+            <!-- value mini-LED 18.9% x203.6 above -->
+            <circle cx="203.6" cy="155" r="5" fill="#2e6bff" stroke="#06080d" stroke-width="1.5"/>
+            <line x1="203.6" y1="150" x2="203.6" y2="120" stroke="#2a3343"/><text x="203.6" y="112" text-anchor="middle" fill="#c6cedb">Value Mini-LED ~$1k</text>
+            <!-- flagship OLED 32% x303.2 below -->
+            <circle cx="303.2" cy="155" r="5" fill="#1fe08a" stroke="#06080d" stroke-width="1.5"/>
+            <line x1="303.2" y1="160" x2="303.2" y2="240" stroke="#2a3343"/><text x="303.2" y="254" text-anchor="middle" fill="#c6cedb">Flagship OLED ~$2.3k</text>
+            <!-- premium mini-LED 36.2% x335 above (offset) -->
+            <circle cx="335" cy="155" r="5" fill="#7ee06a" stroke="#06080d" stroke-width="1.5"/>
+            <line x1="335" y1="150" x2="335" y2="96" stroke="#2a3343"/><text x="335" y="88" text-anchor="middle" fill="#c6cedb">Premium Mini-LED ~$3k</text>
+            <!-- RGB mini-LED 72.3% x609.5 above -->
+            <circle cx="609.5" cy="155" r="6" fill="#f5b544" stroke="#06080d" stroke-width="1.5"/>
+            <line x1="609.5" y1="150" x2="609.5" y2="120" stroke="#f5b544" stroke-opacity=".5"/><text x="609.5" y="112" text-anchor="middle" fill="#f5b544">RGB Mini-LED ~$30k</text>
+            <!-- MicroLED 89.6% x741 below -->
+            <circle cx="741" cy="155" r="6" fill="#ff3b47" stroke="#06080d" stroke-width="1.5"/>
+            <line x1="741" y1="160" x2="741" y2="212" stroke="#ff3b47" stroke-opacity=".5"/><text x="741" y="226" text-anchor="middle" fill="#ff3b47">MicroLED $90k–$173k</text>
+          </g>
+          <text x="60" y="284" font-family="'IBM Plex Mono'" font-size="10.5" fill="#5c6577">Each tick = 3× the price. The eye-opener: a flagship OLED and a budget LCD are far closer to each other than either is to MicroLED.</text>
+        </svg>
+      </div>
+    </figure>
+
+    <div class="prose reveal">
+      <h3>Representative prices by class</h3>
+    </div>
+    <div class="tbl-wrap reveal">
+      <table class="data">
+        <thead><tr><th>Class · example</th><th>55"</th><th>65"</th><th>75–77"</th><th>83–85"</th><th>98–100"+</th></tr></thead>
+        <tbody>
+          <tr><td>Budget OLED · LG B5</td><td class="mono">~$850</td><td class="mono">~$950</td><td class="mono">~$1,500</td><td class="mono">~$2,500</td><td class="mono">—</td></tr>
+          <tr><td>Value OLED · LG C5</td><td class="mono">~$1,300</td><td class="mono">~$1,400</td><td class="mono">~$2,600</td><td class="mono">~$4,000</td><td class="mono">—</td></tr>
+          <tr><td>4-Stack OLED · LG G5</td><td class="mono">~$2,500</td><td class="mono">~$2,300</td><td class="mono">~$3,500</td><td class="mono">~$5,000</td><td class="mono">~$15k (97")</td></tr>
+          <tr><td>QD-OLED · Samsung S95F</td><td class="mono">~$1,850</td><td class="mono">~$2,300</td><td class="mono">~$3,700</td><td class="mono">~$5,300</td><td class="mono">—</td></tr>
+          <tr><td>Value Mini-LED · TCL QM8K</td><td class="mono">~$900</td><td class="mono">~$1,200</td><td class="mono">~$1,450</td><td class="mono">~$2,100</td><td class="mono">~$3,000</td></tr>
+          <tr><td>Mini-LED · Hisense U8QG</td><td class="mono">~$999</td><td class="mono">~$1,400</td><td class="mono">~$1,700</td><td class="mono">~$2,400</td><td class="mono">~$4,998</td></tr>
+          <tr><td>Premium Mini-LED · Sony Bravia 9</td><td class="mono">—</td><td class="mono">~$2,800</td><td class="mono">~$3,700</td><td class="mono">~$4,700</td><td class="mono">—</td></tr>
+          <tr><td>RGB Mini-LED · Hisense 116UX</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">~$30k (116")</td></tr>
+          <tr><td>True MicroLED · Samsung</td><td class="mono">—</td><td class="mono">—</td><td class="mono">$90k (76")</td><td class="mono">~$110k (89")</td><td class="mono">$130k–$173k</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="prose reveal">
+      <h3>Total cost of ownership — the hidden column</h3>
+      <p>Sticker price isn't the whole bill. <strong>Power:</strong> OLED draws less on dark and mixed content (no backlight; LG cites ~20% better efficiency in newer panels), while a full-brightness LCD can be more efficient on all-white content. <strong>Lifespan:</strong> RTINGS' data puts OLED's longevity highest, with LCD backlights the most common failure point — so the cheaper LCD may not be cheaper over ten years. <strong>Burn-in replacement risk:</strong> real only for heavy static-content users (news ticker, game HUD, PC desktop all day); modern pixel-refresh features mitigate it, but it's a genuine reason such users lean LCD. <strong>MicroLED:</strong> 100,000+ hour life and zero burn-in are strong long-term value — utterly buried under the purchase price.</p>
+    </div>
+
+    <div class="callout callout--note reveal">
+      <div class="callout__k">When the frontier gets affordable</div>
+      <p><strong>RGB Mini-LED</strong> will reach mainstream sizes and prices fastest — Sony, TCL and LG are all expanding the class through 2026; it just needs to come down from giant-screen launches. <strong>True MicroLED</strong> needs roughly a 100× cost reduction and is widely seen as years away from living-room prices (not before ~2027, likely later). <strong>QDEL/NanoLED</strong> hinges entirely on solving blue quantum-dot lifetime — realistically late this decade. The rational takeaway: today's OLED-vs-Mini-LED choice is the one that matters, and it will stay that way for several years.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MODULE 08 — WHAT TO BUY ===================== -->
+<section class="module" id="m08">
+  <div class="shell">
+    <div class="module__head reveal">
+      <span class="module__num">MODULE 08 / WHAT TO ACTUALLY BUY</span>
+      <h2 class="module__title">The honest recommendation</h2>
+      <p class="module__intro">All the physics narrows to a few clear picks. Find your budget, then check the decision thresholds — a single fact about your room or habits can override the price tier entirely.</p>
+    </div>
+
+    <div class="rec-grid reveal" id="recgrid"></div>
+
+    <div class="prose reveal">
+      <h3>The four thresholds that override everything</h3>
+      <p>Before you sort by price, check these. Any one of them can flip your decision regardless of budget — they're about how and where <em>you</em> watch.</p>
+      <ul>
+        <li><strong>Bright, sunlit room?</strong> → Prioritise brightness and a matte/anti-reflective screen. Mini-LED, or the Samsung S95F among OLEDs. A dim OLED in a sunny room wastes its strengths.</li>
+        <li><strong>Dark room, movies first?</strong> → OLED, no contest. Perfect black is the whole game in the dark, and it's the one thing LCD physically cannot do.</li>
+        <li><strong>Static content many hours a day</strong> (news tickers, a game HUD, a PC desktop)? → Choose LCD (Mini-LED / QLED) to sidestep burn-in entirely.</li>
+        <li><strong>Competitive PC gamer?</strong> → OLED for motion clarity at 240 Hz+ — unless sustained brightness and burn-in immunity matter more to you, in which case a high-refresh Mini-LED.</li>
+      </ul>
+    </div>
+
+    <div class="callout callout--note reveal">
+      <div class="callout__k">The one-line answer</div>
+      <p>For most people in most rooms, the <strong>LG C5</strong> (or a current QD-OLED like the Samsung S90F) is the rational buy: reference-grade picture, full gaming features, at roughly half the price of a flagship. Go brighter (Mini-LED, RGB Mini-LED) only if your room demands it; go flagship OLED only if you want the best and will see it. And <strong>wait</strong> for MicroLED or QDEL only if you have a five-figure budget and a 100-inch wall to fill.</p>
+    </div>
+
+    <div class="prose reveal" style="margin-top:48px">
+      <h3>Watch &amp; go deeper</h3>
+      <p>The figures in this guide come from labs that publish their methodology and show their measurements on video. These are the most authoritative independent voices in display testing — worth your time if you want to go further.</p>
+    </div>
+    <div class="vid-grid reveal" id="vidgrid"></div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="footer reveal">
+  <h3>Sources &amp; further reading</h3>
+  <div class="src-grid">
+    <a href="https://www.rtings.com" target="_blank" rel="noopener">RTINGS — reviews &amp; longevity test <span>rtings.com</span></a>
+    <a href="https://www.flatpanelshd.com" target="_blank" rel="noopener">FlatpanelsHD — panel measurements <span>flatpanelshd.com</span></a>
+    <a href="https://www.youtube.com/@hdtvtest" target="_blank" rel="noopener">HDTVTest — Vincent Teoh <span>youtube</span></a>
+    <a href="https://www.displaydaily.com" target="_blank" rel="noopener">Display Daily — industry analysis <span>displaydaily.com</span></a>
+    <a href="https://www.oled-info.com" target="_blank" rel="noopener">OLED-Info — OLED &amp; PHOLED <span>oled-info.com</span></a>
+    <a href="https://www.microled-info.com" target="_blank" rel="noopener">MicroLED-Info — MicroLED tracking <span>microled-info.com</span></a>
+    <a href="https://www.tomsguide.com/tvs" target="_blank" rel="noopener">Tom's Guide — TV reviews <span>tomsguide.com</span></a>
+    <a href="https://www.techradar.com/televisions" target="_blank" rel="noopener">TechRadar — TV reviews <span>techradar.com</span></a>
+    <a href="https://www.avsforum.com" target="_blank" rel="noopener">AVS Forum — enthusiast testing <span>avsforum.com</span></a>
+    <a href="https://www.tomshardware.com/monitors" target="_blank" rel="noopener">Tom's Hardware — panel tech <span>tomshardware.com</span></a>
+    <a href="https://oled.com" target="_blank" rel="noopener">Universal Display — PHOLED <span>oled.com</span></a>
+    <a href="https://www.samsungdisplay.com" target="_blank" rel="noopener">Samsung Display — QD-OLED <span>samsungdisplay.com</span></a>
+  </div>
+  <p class="footer__meta">
+    Compiled 2025–2026 from independent lab measurements, manufacturer technical disclosures, and display-industry analysis. Brightness figures are calibrated measurements (~10% window) unless noted; manufacturer peak claims are flagged as such. Prices are approximate US street/sale prices and move constantly. Emerging-technology timelines include vendor projections and should be read as estimates, not promises. All diagrams are original illustrations. This guide is independent and not affiliated with any manufacturer.<br><br>
+    PHYSICS OF THE PICTURE · a field guide to how televisions make light · built from photons to price tags.
+  </p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- scroll progress spine ---------- */
+  var spine=document.getElementById('spine');
+  function onScroll(){
+    var h=document.documentElement;
+    var max=h.scrollHeight-h.clientHeight;
+    var p=max>0?(h.scrollTop||document.body.scrollTop)/max:0;
+    spine.style.width=(p*100).toFixed(2)+'%';
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  onScroll();
+
+  /* ---------- reveal on scroll (deterministic — never leaves content hidden) ---------- */
+  var reveals=[].slice.call(document.querySelectorAll('.reveal'));
+  var rTick=false;
+  function revealCheck(){
+    rTick=false;
+    var vh=window.innerHeight||document.documentElement.clientHeight;
+    var doc=document.documentElement;
+    var atBottom=(window.scrollY||doc.scrollTop)+vh >= doc.scrollHeight-4;
+    for(var i=reveals.length-1;i>=0;i--){
+      var r=reveals[i].getBoundingClientRect();
+      // reveal once the element's top has crossed 90% of the viewport (in-view or already passed),
+      // and force-reveal everything remaining once the page bottom is reached
+      if(atBottom || r.top < vh*0.90){
+        reveals[i].classList.add('in');
+        reveals.splice(i,1);
+      }
+    }
+  }
+  function onRevealScroll(){ if(!rTick){rTick=true;requestAnimationFrame(revealCheck);} }
+  window.addEventListener('scroll',onRevealScroll,{passive:true});
+  window.addEventListener('resize',onRevealScroll,{passive:true});
+  window.addEventListener('load',revealCheck);
+  revealCheck();
+
+  /* ---------- tooltip for charts + key terms ---------- */
+  var tip=document.getElementById('tip');
+  function showTip(html,x,y){
+    tip.innerHTML=html;tip.style.opacity='1';
+    var pad=16,w=tip.offsetWidth,h=tip.offsetHeight;
+    var nx=x+pad, ny=y+pad;
+    if(nx+w>window.innerWidth-10)nx=x-w-pad;
+    if(ny+h>window.innerHeight-10)ny=y-h-pad;
+    tip.style.left=nx+'px';tip.style.top=ny+'px';
+  }
+  function hideTip(){tip.style.opacity='0';}
+  document.querySelectorAll('.bar').forEach(function(b){
+    b.style.cursor='crosshair';
+    b.addEventListener('mousemove',function(ev){
+      showTip('<b>'+b.getAttribute('data-name')+'</b><br><span class="mono">'+b.getAttribute('data-val')+'</span>',ev.clientX,ev.clientY);
+    });
+    b.addEventListener('mouseleave',hideTip);
+  });
+  document.querySelectorAll('.term').forEach(function(t){
+    t.addEventListener('mousemove',function(ev){showTip(t.getAttribute('data-tip'),ev.clientX,ev.clientY);});
+    t.addEventListener('mouseleave',hideTip);
+  });
+
+  /* ---------- comparison matrix ---------- */
+  var traits=["Black level / contrast","Peak brightness","Full-screen brightness","Colour volume","Viewing angles","Motion clarity","Burn-in resistance","Bright-room","Value (picture/$)"];
+  var techRatings={
+    "LED-LCD":      [2,2,4,2,2,2,5,3,5],
+    "QLED":         [2,3,4,3,2,2,5,4,4],
+    "Mini-LED":     [4,5,5,4,2,3,5,5,4],
+    "RGB Mini-LED": [4,5,5,5,3,3,5,5,1],
+    "WOLED":        [5,3,2,3,5,5,3,3,3],
+    "4-Stack OLED": [5,4,3,4,5,5,3,4,2],
+    "QD-OLED":      [5,4,2,5,5,5,3,3,3],
+    "MicroLED":     [5,5,5,5,5,5,5,5,1]
+  };
+  var techOrder=["LED-LCD","QLED","Mini-LED","RGB Mini-LED","WOLED","4-Stack OLED","QD-OLED","MicroLED"];
+  var heat=['#ff3b47','#ff7a3c','#f5b544','#9be86a','#1fe08a'];
+  var mb=document.getElementById('matrix');
+  if(mb){
+    traits.forEach(function(tr,i){
+      var row='<tr><td>'+tr+'</td>';
+      techOrder.forEach(function(tk){
+        var v=techRatings[tk][i];
+        row+='<td class="ratecell"><div class="rate" title="'+v+'/5"><span style="width:'+(v*20)+'%;background:'+heat[v-1]+'"></span></div></td>';
+      });
+      row+='</tr>';
+      mb.insertAdjacentHTML('beforeend',row);
+    });
+  }
+
+  /* ---------- use-case grid ---------- */
+  var uses=[
+    {u:"Bright / sunlit room",p:"Mini-LED",w:"Brightness + matte screens punch through glare; among OLEDs, the Samsung S95F."},
+    {u:"Dark home theatre",p:"OLED",w:"Perfect black dominates in the dark — QD-OLED for colour pop, 4-stack for brightness."},
+    {u:"Console gaming · 4K/120",p:"OLED",w:"Instant response, infinite contrast, full HDMI 2.1 / VRR on LG & Samsung sets."},
+    {u:"PC high-refresh gaming",p:"OLED 240Hz+",w:"Cleanest motion; pick a Mini-LED only if burn-in worry outweighs it."},
+    {u:"Text / productivity",p:"WOLED",w:"Cleaner small-text rendering & sustained brightness vs QD-OLED — or LCD to avoid burn-in."},
+    {u:"Static content all day",p:"Mini-LED / QLED",w:"No burn-in risk for tickers, HUDs and desktops left on for hours."},
+    {u:"Big screen on a budget",p:"Mini-LED",w:"Unbeatable cost-per-inch at 85–100\"; TCL & Hisense lead the class."},
+    {u:"Money no object",p:"RGB Mini-LED / MicroLED",w:"Showcase brightness & size — at a massive early-adopter premium."}
+  ];
+  var ug=document.getElementById('usecases');
+  if(ug){
+    uses.forEach(function(c){
+      ug.insertAdjacentHTML('beforeend',
+        '<div class="uc"><div class="uc__use">'+c.u+'</div><div class="uc__pick">'+c.p+'</div><div class="uc__why">'+c.w+'</div></div>');
+    });
+  }
+
+  /* ---------- recommendation grid ---------- */
+  var recs=[
+    {t:"Under $1,000",pr:"Best value",pk:"Hisense U8QG / TCL QM8K",w:"Flagship-level Mini-LED brightness and full gaming features for the money. Budget OLED alt: LG B5 (55\").",c:"#4d7cff"},
+    {t:"$1,200 – 1,800",pr:"The sweet spot",pk:"LG C5",w:"The best all-rounder — reference OLED picture, full gaming suite, ~half flagship price. Alt: Samsung S90F.",c:"#1fe08a"},
+    {t:"$2,000 – 3,500",pr:"Flagship",pk:"S95F · G5 · Bravia 8 II",w:"The brightest, most colourful OLEDs — or Sony Bravia 9 / TCL QM9K for premium Mini-LED without burn-in worry.",c:"#f5b544"},
+    {t:"85 – 100 inch",pr:"Big-screen value",pk:"TCL / Hisense Mini-LED",w:"98–100\" for roughly $2k–$5k. Nothing else comes close on cost per inch at this size.",c:"#2bd9ff"},
+    {t:"Money no object",pr:"$30,000 +",pk:"RGB Mini-LED / MicroLED",w:"A 100\"+ showcase for a five-figure budget — you're paying for size, not necessarily better per-inch picture.",c:"#ff3b47"}
+  ];
+  var rg=document.getElementById('recgrid');
+  if(rg){
+    recs.forEach(function(c){
+      rg.insertAdjacentHTML('beforeend',
+        '<div class="rec"><div class="rec__strip" style="background:'+c.c+'"></div><div class="rec__body">'+
+        '<div class="rec__tier">'+c.t+'</div><div class="rec__price">'+c.pr+'</div>'+
+        '<div class="rec__pick">'+c.pk+'</div><div class="rec__why">'+c.w+'</div></div></div>');
+    });
+  }
+
+  /* ---------- video resources ---------- */
+  var vids=[
+    {n:"HDTVTest",w:"Vincent Teoh · calibrated reviews",u:"https://www.youtube.com/@hdtvtest"},
+    {n:"RTINGS",w:"The burn-in / longevity test",u:"https://www.youtube.com/results?search_query=rtings+tv+longevity+burn+in+test"},
+    {n:"FlatpanelsHD",w:"Panel technology deep-dives",u:"https://www.youtube.com/@FlatpanelsHD"},
+    {n:"LG Display",w:"OLED & Tandem tech explainers",u:"https://www.youtube.com/results?search_query=LG+Display+primary+RGB+tandem+OLED"},
+    {n:"Samsung Display",w:"QD-OLED technology",u:"https://www.youtube.com/results?search_query=Samsung+Display+QD-OLED+how+it+works"},
+    {n:"Value Electronics",w:"Annual TV Shootout",u:"https://www.youtube.com/results?search_query=value+electronics+flat+panel+tv+shootout"}
+  ];
+  var vg=document.getElementById('vidgrid');
+  if(vg){
+    vids.forEach(function(c){
+      vg.insertAdjacentHTML('beforeend',
+        '<a class="vid" href="'+c.u+'" target="_blank" rel="noopener"><div class="vid__thumb"><div class="vid__play"></div></div>'+
+        '<div class="vid__meta"><div class="vid__name">'+c.n+'</div><div class="vid__who">'+c.w+'</div></div></a>');
+    });
+  }
+
+  /* ---------- interactive blooming demo ---------- */
+  var cv=document.getElementById('bloomCanvas');
+  if(cv){
+    var ctx=cv.getContext('2d');
+    var W=cv.width,H=cv.height;
+    // build the "true" scene once on an offscreen canvas
+    var off=document.createElement('canvas');off.width=W;off.height=H;
+    var octx=off.getContext('2d');
+    function drawScene(){
+      octx.fillStyle='#000';octx.fillRect(0,0,W,H);
+      // moon with soft edge
+      var mx=250,my=140,mr=52;
+      var g=octx.createRadialGradient(mx,my,mr*0.55,mx,my,mr);
+      g.addColorStop(0,'#ffffff');g.addColorStop(0.75,'#ffffff');g.addColorStop(1,'rgba(255,255,255,0)');
+      octx.fillStyle=g;octx.beginPath();octx.arc(mx,my,mr,0,7);octx.fill();
+      // a few stars
+      octx.fillStyle='#ffffff';
+      [[520,60,2],[600,120,1.5],[680,80,2],[470,180,1.4],[720,200,1.8],[560,40,1.3]].forEach(function(s){
+        octx.beginPath();octx.arc(s[0],s[1],s[2],0,7);octx.fill();
+      });
+      // subtitle bars
+      octx.fillStyle='#ffffff';
+      octx.fillRect(250,300,300,14);
+      octx.fillRect(310,322,180,12);
+    }
+    drawScene();
+    var sceneData=octx.getImageData(0,0,W,H).data;
+    function lumAt(i){ return sceneData[i]/255; } // red channel == luminance (white/black scene)
+
+    function render(zones){
+      var out=ctx.createImageData(W,H);
+      var d=out.data;
+      if(zones===0){
+        // OLED: per-pixel exact, true black
+        for(var i=0;i<d.length;i+=4){
+          var L=sceneData[i];
+          d[i]=L;d[i+1]=L;d[i+2]=L;d[i+3]=255;
+        }
+      }else{
+        // derive zone grid ~16:9
+        var rows=Math.max(1,Math.round(Math.sqrt(zones*H/W)));
+        var cols=Math.max(1,Math.round(zones/rows));
+        var zw=W/cols, zh=H/rows;
+        // backlight level per zone = max luminance inside
+        var bl=new Float32Array(cols*rows);
+        for(var p=0;p<W*H;p++){
+          var x=p%W, y=(p/W)|0;
+          var L=sceneData[p*4]/255;
+          if(L>0){
+            var zc=Math.min(cols-1,(x/zw)|0), zr=Math.min(rows-1,(y/zh)|0);
+            var zi=zr*cols+zc;
+            if(L>bl[zi])bl[zi]=L;
+          }
+        }
+        var leak=0.018; // panel light leakage in lit zones
+        for(var q=0;q<W*H;q++){
+          var xx=q%W, yy=(q/W)|0;
+          var sL=sceneData[q*4]/255;
+          var zc2=Math.min(cols-1,(xx/zw)|0), zr2=Math.min(rows-1,(yy/zh)|0);
+          var zlevel=bl[zr2*cols+zc2];
+          var floorL=zlevel*leak;          // grey bloom raised by backlight
+          var v=Math.max(sL,floorL);
+          var idx=q*4;
+          if(sL>0.5){ // the bright object itself -> white
+            var vv=Math.round(v*255);
+            d[idx]=vv;d[idx+1]=vv;d[idx+2]=vv;
+          }else{ // bloom halo -> cool blue-grey (LCD backlight tint)
+            var vb=v*255;
+            d[idx]=Math.round(vb*0.55);
+            d[idx+1]=Math.round(vb*0.72);
+            d[idx+2]=Math.round(Math.min(255,vb*1.05));
+          }
+          d[idx+3]=255;
+        }
+      }
+      ctx.putImageData(out,0,0);
+    }
+
+    var label=document.getElementById('bloomLabel');
+    var notes={2:"This is essentially no local dimming — the whole region lifts.",16:"Better, but the halos are large and obvious.",96:"Decent — typical of a mid-range Mini-LED.",384:"Tight halos — like a high-end Mini-LED, yet still not true black."};
+    function setMode(z,btn){
+      document.querySelectorAll('#bloomBtns .zbtn').forEach(function(b){b.classList.remove('active');});
+      if(btn)btn.classList.add('active');
+      render(z);
+      if(z===0){
+        label.innerHTML='Showing <b style="color:#2bd9ff">emissive / OLED</b> — each pixel is its own light, so the black around the moon and subtitles is perfectly dark. Zero halo.';
+      }else{
+        label.innerHTML='Showing <b style="color:#2bd9ff">LCD · '+z+' dimming zones</b> — the backlight dims only in blocks, so grey-blue light bleeds into the black. '+notes[z];
+      }
+    }
+    document.querySelectorAll('#bloomBtns .zbtn').forEach(function(b){
+      b.addEventListener('click',function(){setMode(parseInt(b.getAttribute('data-z'),10),b);});
+    });
+    // initial
+    render(0);
+  }
+
+  /* ---------- smooth anchor focus (a11y) ---------- */
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click',function(){
+      var id=a.getAttribute('href');
+      if(id.length>1){
+        var el=document.querySelector(id);
+        if(el){setTimeout(function(){el.setAttribute('tabindex','-1');el.focus({preventScroll:true});},420);}
+      }
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
